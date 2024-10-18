@@ -116,7 +116,7 @@ const std::map<jsonStates, dataTypes> jsonStateMap = {
 
 // Then Declare a list of key commands that will be required to be parsed. This must match the order of the enums above
 static char jsonCommandKeys[][6] = {
-  "NULL",
+  "none",
   "A0", "A1", "A2", "A3", "A4",
   "B0", "B1", "B2", "B3", "B4",
   "C0", "C1", "C2", "C3", "C4",

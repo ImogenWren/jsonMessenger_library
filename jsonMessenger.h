@@ -42,7 +42,7 @@ private:
   //# JSON Varibles & Object Declaration
   // These variables relate to incoming serial commands
   // was 64 reduced to save space
-  StaticJsonDocument<JSON_RX_SIZE> jsonRXdoc;  // This is the JSON object
+ // StaticJsonDocument<JSON_RX_SIZE> jsonRXdoc;  // This is the JSON object
   //JsonDocument doc;  // This version for V7.x.x Dynamically assigned memory
 
 
@@ -55,7 +55,7 @@ public:
 
   jsonStateData jsonReadSerialLoop();  // function needs to be called periodically to accept incoming serial messages, parse & return jsonStateData with new state /and data required for new state
 
-  void printJSON();  // Prints the static jsonRXdoc
+  void printJSON(StaticJsonDocument<JSON_RX_SIZE> jsonDoc);  // Prints the static jsonRXdoc
 
 
 
