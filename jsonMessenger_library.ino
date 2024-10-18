@@ -60,7 +60,7 @@ void loop() {
 
   jsonStateData nextState = jsonRX.jsonReadSerialLoop();
 
-  /*
+  
   if (nextState.cmd_received) {  // If command is received
     char buffer[64];
     char databuffer[16];
@@ -75,11 +75,11 @@ void loop() {
     } else {
       std::cout << "Exception in Returned Data" << std::endl;
     }
-    sprintf(buffer, "cmd: %s, data: %s, data_type: %s ", jsonCommandKeys[nextState.cmdState], databuffer, typeNames[nextState.data_type]);
+    sprintf(buffer, "cmd: %s, data_type: %s, data: %s, ", jsonCommandKeys[nextState.cmdState],  typeNames[nextState.data_type], databuffer);
     // std::cout << buffer << std::endl;
     Serial.println(buffer);
   }
-*/
+
   if (printDelay.millisDelay(5000)) {
  //   ram.getPrintStats("loop");
     Serial.println("Alive and Loop");

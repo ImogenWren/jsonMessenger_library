@@ -79,17 +79,24 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
         } else if (data_type == INTEGER) {                      // Example of how to deal with different datatypes returned from jsonMessenger object
           itoa(jsonRXdoc[jsonCommandKeys[i]], databuffer, 10);  // 10: base 10 // If integer copy integer to string
           jsonRX_data.numeric = jsonRXdoc[jsonCommandKeys[i]];
-
+          jsonRX_data.data_type = INTEGER;
         } else if (data_type == FLOAT) {
           dtostrf(jsonRXdoc[jsonCommandKeys[i]], 2, 2, databuffer);
           jsonRX_data.data = jsonRXdoc[jsonCommandKeys[i]];
+jsonRX_data.data_type = FLOAT;
+        } else if (data_type == CHAR_ARRAY) {                     // TODO FIND SAFER METHOD FOR THIS
+         // int length = sizeof(root[jsonCommandKeys[i]]);
+         // while (jsonRXdoc[jsonCommandKeys[i]][length] != "\0" ){
+        //    length++;
+          //   std::cout << "counting . . . " << length  << std::endl;
+         // }
+         // std::cout << "length:" << length << std::endl;
+          strcpy(databuffer, jsonRXdoc[jsonCommandKeys[i]]);
+    
+          strcpy(jsonRX_data.msg, jsonRXdoc[jsonCommandKeys[i]]);  // This does allow string overloading and CANNOT BE CONSIDERED SAFE
+          //jsonRX_data.msg[15] = "\0";  
+          jsonRX_data.data_type = CHAR_ARRAY;
 
-        } else if (data_type == CHAR_ARRAY) {
-          strcpy(databuffer, jsonRXdoc["usr"]);        ///jsonCommandKeys[i]].as<const char*>());
-         // databuffer = jsonRXdoc["usr"];
-          //strcpy(jsonRX_data.msg, root[jsonCommandKeys[i]]);
-          //const char* message = root[jsonCommandKeys[i]].as<const char*>();  // this is type varient, must be cast to cstring
-         // strcpy(databuffer, message);
         } else {
           std::cout << "Exception in State Definitions" << std::endl;
         }
