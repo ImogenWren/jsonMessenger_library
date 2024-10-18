@@ -82,40 +82,40 @@ typedef enum {
 // Now Link each jsonState ENUM with the datatype ENUM in a map structure.
 //In this example most will be integers, but will include some cstrings to test
 const std::map<jsonStates, dataTypes> jsonStateMap = {
-  { NONE, EMPTY },
-  { FAN_A0, INTEGER },
-  { FAN_A1, INTEGER },
-  { FAN_A2, INTEGER },
-  { FAN_A3, INTEGER },
-  { FAN_A4, INTEGER },
-  { FAN_B0, INTEGER },
-  { FAN_B1, INTEGER },
-  { FAN_B2, INTEGER },
-  { FAN_B3, INTEGER },
-  { FAN_B4, INTEGER },
-  { FAN_C0, INTEGER },
-  { FAN_C1, INTEGER },
-  { FAN_C2, INTEGER },
-  { FAN_C3, INTEGER },
-  { FAN_C4, INTEGER },
-  { FAN_D0, INTEGER },
-  { FAN_D1, INTEGER },
-  { FAN_D2, INTEGER },
-  { FAN_D3, INTEGER },
-  { FAN_D4, INTEGER },
-  { FAN_E0, INTEGER },
-  { FAN_E1, INTEGER },
-  { FAN_E2, INTEGER },
-  { FAN_E3, INTEGER },
-  { FAN_E4, INTEGER },
-  { ALL, INTEGER },
-  { MOD, INTEGER },
-  { USR, CHAR_ARRAY }
+  { jsonStates::NONE, dataTypes::EMPTY },
+  { jsonStates::FAN_A0, dataTypes::INTEGER },
+  { jsonStates::FAN_A1, dataTypes::INTEGER },
+  { jsonStates::FAN_A2, dataTypes::INTEGER },
+  { jsonStates::FAN_A3, dataTypes::INTEGER },
+  { jsonStates::FAN_A4, dataTypes::INTEGER },
+  { jsonStates::FAN_B0, dataTypes::INTEGER },
+  { jsonStates::FAN_B1, dataTypes::INTEGER },
+  { jsonStates::FAN_B2, dataTypes::INTEGER },
+  { jsonStates::FAN_B3, dataTypes::INTEGER },
+  { jsonStates::FAN_B4, dataTypes::INTEGER },
+  { jsonStates::FAN_C0, dataTypes::INTEGER },
+  { jsonStates::FAN_C1, dataTypes::INTEGER },
+  { jsonStates::FAN_C2, dataTypes::INTEGER },
+  { jsonStates::FAN_C3, dataTypes::INTEGER },
+  { jsonStates::FAN_C4, dataTypes::INTEGER },
+  { jsonStates::FAN_D0, dataTypes::INTEGER },
+  { jsonStates::FAN_D1, dataTypes::INTEGER },
+  { jsonStates::FAN_D2, dataTypes::INTEGER },
+  { jsonStates::FAN_D3, dataTypes::INTEGER },
+  { jsonStates::FAN_D4, dataTypes::INTEGER },
+  { jsonStates::FAN_E0, dataTypes::INTEGER },
+  { jsonStates::FAN_E1, dataTypes::INTEGER },
+  { jsonStates::FAN_E2, dataTypes::INTEGER },
+  { jsonStates::FAN_E3, dataTypes::INTEGER },
+  { jsonStates::FAN_E4, dataTypes::INTEGER },
+  { jsonStates::ALL, dataTypes::INTEGER },
+  { jsonStates::MOD, dataTypes::FLOAT },
+  { jsonStates::USR, dataTypes::CHAR_ARRAY }
 };
 
 
 // Then Declare a list of key commands that will be required to be parsed. This must match the order of the enums above
-static char jsonCommandKeys[][4] = {
+static char jsonCommandKeys[][6] = {
   "NULL",
   "A0", "A1", "A2", "A3", "A4",
   "B0", "B1", "B2", "B3", "B4",
@@ -133,7 +133,8 @@ static char jsonGenerics[][6] = {
   "set",
   "to",
   "get"
-}
+};
+
 
 
 // Finally Declare a structure that will hold both the jsonStates enum, and any data that will need to be passed from jsonMessenger, into the states.

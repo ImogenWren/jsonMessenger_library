@@ -9,7 +9,7 @@ jsonMessenger::jsonMessenger() {
 
 void jsonMessenger::jsonBegin() {
   Serial.begin(115200);
-  Serial.println("{\"json\":\"Messenger\", \"version\":\"V0.0.0\"}");
+  Serial.println(F("{\"json\":\"Messenger\", \"version\":\"V0.0.0\"}"));
 }
 
 
@@ -34,28 +34,69 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
   bool commandParsed = false;
   int error = 0;
   char command[JSON_RX_SIZE];
-  jsonStateData jsonRX_data = { NONE, EMPTY, 0, 0, "", false };
+  jsonStateData jsonRX_data = { NONE, EMPTY, 0, 0.0, "", false };
 
   if (Serial.available() > 0) {
-    Serial.readBytesUntil(10, command, JSON_RX_SIZE);
+    // Receive Command
+    Serial.readBytesUntil(10, command, JSON_RX_SIZE);  // 10 = "\n"
     Serial.print(F("\ncommand received: "));
     Serial.println(command);
 
-
+    // Analyse data
     deserializeJson(jsonRXdoc, command);
     JsonObject root = jsonRXdoc.as<JsonObject>();  // this was previously doc.to<JsonObject>(); DID NOT WORK! does now with "as"
-    // Now to parse the JSON message
-    // First get number of elements in the jsonStates enum
-    //int numValues = NUM_VALUES;
+                                                   // Now to parse the JSON message
+                                                   // First get number of elements in the jsonStates enum numValues = NUM_VALUES;
+                                                   // Then loop through all keys & see if root contains key
     for (int i = 0; i < NUM_VALUES; i++) {         // loop through all the keys
       if (root.containsKey(jsonCommandKeys[i])) {  // Match is found, I holds the correct ENUM reference for the state
-        auto map_item = jsonStateMap.find(i);      // This returns an iterator type
-        dataTypes data_type = map_item->second;
-        std::cout << "i = " << i << " cmd: " << jsonCommandKeys[i] << " ,Data type: " << typeNames[data_type] << std::endl;  //
-        // then deal with data depending on state
+
+        // jsonStates newState = static_cast<jsonStates>(i);    // Cast int to explicit enum type   // this doesnt seem to clear up any errors
+
+       // jsonStates newState = i;
+        auto map_item = jsonStateMap.find(i);    // This returns an iterator type
+        dataTypes data_type = map_item->second;  // the second value contains the dataType enum
+
+
+
+        // Set the flags to trigger the state change
+        // jsonRX_data.cmdState = newState;
         jsonRX_data.cmdState = i;
-        jsonRX_data.cmd_received = true;
-        return jsonRX_data;                        // return the structure as the data has been extracted
+        jsonRX_data.cmd_received = true;  //
+
+        // then deal with data depending on state
+        char databuffer[16];  // Create a buffer to hold text string
+        // Copy data into both correct place in data structure, and convert to string for debugging printing
+        if (data_type == EMPTY) {
+          strcpy(databuffer, "empty");
+
+        } else if (data_type == INTEGER) {                      // Example of how to deal with different datatypes returned from jsonMessenger object
+          itoa(jsonRXdoc[jsonCommandKeys[i]], databuffer, 10);  // 10: base 10 // If integer copy integer to string
+          jsonRX_data.numeric = jsonRXdoc[jsonCommandKeys[i]];
+
+        } else if (data_type == FLOAT) {
+          dtostrf(jsonRXdoc[jsonCommandKeys[i]], 2, 2, databuffer);
+          jsonRX_data.data = jsonRXdoc[jsonCommandKeys[i]];
+
+        } else if (data_type == CHAR_ARRAY) {
+          //strcpy(databuffer, root[jsonCommandKeys[i]]);
+          //  strcpy(jsonRX_data.msg, root[jsonCommandKeys[i]]);
+          //const char* message = root[jsonCommandKeys[i]];  // this is type varient, must be cast to cstring
+          //strcpy(databuffer, message);
+        } else {
+          std::cout << "Exception in State Definitions" << std::endl;
+        }
+
+        // Debug Output from JSON parser
+        //std::cout << "i = " << i << " cmd: " << jsonCommandKeys[i] << " , Data type: " << typeNames[data_type] << std::endl;  //
+        char buffer[64];
+        sprintf(buffer, "i = %i, cmd: %s, data-type: %s, data: %s", i, jsonCommandKeys[i], typeNames[data_type], databuffer);
+        Serial.println(buffer);
+
+
+        return jsonRX_data;  // return the structure as the data has been extracted
+      } else {
+        // root did not contain key, but command could be further analysed to see if any other data
       }
     }
   }
