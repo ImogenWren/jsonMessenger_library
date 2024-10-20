@@ -23,6 +23,7 @@ Version V0.0.0
 #endif
 
 
+#include <stdio.h>
 #include <ArduinoJson.h>
 
 #include "jsonConfig.h"

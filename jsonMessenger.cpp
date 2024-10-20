@@ -83,18 +83,20 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
         } else if (data_type == FLOAT) {
           dtostrf(jsonRXdoc[jsonCommandKeys[i]], 2, 2, databuffer);
           jsonRX_data.data = jsonRXdoc[jsonCommandKeys[i]];
-jsonRX_data.data_type = FLOAT;
-        } else if (data_type == CHAR_ARRAY) {                     // TODO FIND SAFER METHOD FOR THIS
-         // int length = sizeof(root[jsonCommandKeys[i]]);
-         // while (jsonRXdoc[jsonCommandKeys[i]][length] != "\0" ){
-        //    length++;
-          //   std::cout << "counting . . . " << length  << std::endl;
-         // }
-         // std::cout << "length:" << length << std::endl;
-          strcpy(databuffer, jsonRXdoc[jsonCommandKeys[i]]);
-    
-          strcpy(jsonRX_data.msg, jsonRXdoc[jsonCommandKeys[i]]);  // This does allow string overloading and CANNOT BE CONSIDERED SAFE
-          //jsonRX_data.msg[15] = "\0";  
+          jsonRX_data.data_type = FLOAT;
+        } else if (data_type == CHAR_ARRAY) {  // TODO FIND SAFER METHOD FOR THIS
+                                               // int length = sizeof(root[jsonCommandKeys[i]]);
+                                               // while (jsonRXdoc[jsonCommandKeys[i]][length] != "\0" ){
+                                               //    length++;
+                                               //   std::cout << "counting . . . " << length  << std::endl;
+                                               // }
+                                               // std::cout << "length:" << length << std::endl;
+                                               // strcpy(databuffer, jsonRXdoc[jsonCommandKeys[i]]);  // THIS ONE WORK JUST IS NOT SAFE
+                                               //databuffer[15] = "\0";
+          snprintf(databuffer, "%.15s\0", root[jsonCommandKeys[i]]);
+          snprintf(jsonRX_data.msg, "%.15s\0", root[jsonCommandKeys[i]]);
+          // strcpy(jsonRX_data.msg, jsonRXdoc[jsonCommandKeys[i]]);  // This does allow string overloading and CANNOT BE CONSIDERED SAFE
+          //jsonRX_data.msg[15] = "\0";
           jsonRX_data.data_type = CHAR_ARRAY;
 
         } else {
