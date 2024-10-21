@@ -60,7 +60,7 @@ void loop() {
 
   jsonStateData nextState = jsonRX.jsonReadSerialLoop();
 
-  
+ /* 
   if (nextState.cmd_received) {  // If command is received
     char buffer[64];
     char databuffer[16];
@@ -79,7 +79,7 @@ void loop() {
     // std::cout << buffer << std::endl;
     Serial.println(buffer);
   }
-
+*/
   if (printDelay.millisDelay(5000)) {
  //   ram.getPrintStats("loop");
     Serial.println("Alive and Loop");

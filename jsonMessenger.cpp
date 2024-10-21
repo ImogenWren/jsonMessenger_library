@@ -69,7 +69,7 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
         jsonRX_data.cmd_received = true;  //
 
         // then deal with data depending on state
-        const char databuffer[16];  // Create a buffer to hold text string    #TODO ISSUE IS HERE LIKELY take out * to
+        char databuffer[16];  // Create a buffer to hold text string    #TODO ISSUE IS HERE LIKELY take out * to
 
 
         // Copy data into both correct place in data structure, and convert to string for debugging printing
@@ -85,22 +85,26 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
           jsonRX_data.data = jsonRXdoc[jsonCommandKeys[i]];
           jsonRX_data.data_type = FLOAT;
         } else if (data_type == CHAR_ARRAY) {  // TODO FIND SAFER METHOD FOR THIS
-                                               // int length = sizeof(root[jsonCommandKeys[i]]);
-                                               // while (jsonRXdoc[jsonCommandKeys[i]][length] != "\0" ){
-                                               //    length++;
-                                               //   std::cout << "counting . . . " << length  << std::endl;
-                                               // }
-                                               // std::cout << "length:" << length << std::endl;
-                                               // strcpy(databuffer, jsonRXdoc[jsonCommandKeys[i]]);  // THIS ONE WORK JUST IS NOT SAFE
-                                               //databuffer[15] = "\0";
-          snprintf(databuffer, "%.15s\0", root[jsonCommandKeys[i]]);
-          snprintf(jsonRX_data.msg, "%.15s\0", root[jsonCommandKeys[i]]);
-          // strcpy(jsonRX_data.msg, jsonRXdoc[jsonCommandKeys[i]]);  // This does allow string overloading and CANNOT BE CONSIDERED SAFE
-          //jsonRX_data.msg[15] = "\0";
+
+          const char* extracted = jsonRXdoc["usr"];  // "testtestesttest"
+          memcpy(databuffer, extracted, 15);
+          memcpy(jsonRX_data.msg, extracted, 15);
+          // int length = sizeof(root[jsonCommandKeys[i]]);
+          // while (jsonRXdoc[jsonCommandKeys[i]][length] != "\0" ){
+          //    length++;
+          //   std::cout << "counting . . . " << length  << std::endl;
+          // }
+          // std::cout << "length:" << length << std::endl;
+
+         // databuffer[15] = "\n";
+          //  snprintf(databuffer, "%.15s\0", root[jsonCommandKeys[i]]);
+          //  snprintf(jsonRX_data.msg, "%.15s\0", root[jsonCommandKeys[i]]);
+          //strcpy(jsonRX_data.msg, jsonRXdoc[jsonCommandKeys[i]]);  // This does allow string overloading and CANNOT BE CONSIDERED SAFE
+         // jsonRX_data.msg[15] = "\n";
           jsonRX_data.data_type = CHAR_ARRAY;
 
         } else {
-          std::cout << "Exception in State Definitions" << std::endl;
+          std::cout << "Exception in Data Type Definitions" << std::endl;
         }
 
         // Debug Output from JSON parser
