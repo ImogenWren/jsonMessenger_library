@@ -61,6 +61,8 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
         auto map_item = jsonStateMap.find(i);    // This returns an iterator type
         dataTypes data_type = map_item->second;  // the second value contains the dataType enum
 
+        std::cout << typeNames[data_type] << std::endl;
+
 
 
         // Set the flags to trigger the state change
@@ -78,42 +80,28 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
 
         } else if (data_type == INTEGER) {                      // Example of how to deal with different datatypes returned from jsonMessenger object
           itoa(jsonRXdoc[jsonCommandKeys[i]], databuffer, 10);  // 10: base 10 // If integer copy integer to string
-          jsonRX_data.numeric = jsonRXdoc[jsonCommandKeys[i]];
+          jsonRX_data.numeric = jsonRXdoc[jsonCommandKeys[i]].as<uint16_t>();
           jsonRX_data.data_type = INTEGER;
         } else if (data_type == FLOAT) {
           dtostrf(jsonRXdoc[jsonCommandKeys[i]], 2, 2, databuffer);
-          jsonRX_data.data = jsonRXdoc[jsonCommandKeys[i]];
+          jsonRX_data.data = jsonRXdoc[jsonCommandKeys[i]].as<float>();
           jsonRX_data.data_type = FLOAT;
-        } else if (data_type == CHAR_ARRAY) {  // TODO FIND SAFER METHOD FOR THIS
-
-          const char* extracted = jsonRXdoc["usr"];  // "testtestesttest"
-          memcpy(databuffer, extracted, 15);
-          memcpy(jsonRX_data.msg, extracted, 15);
-          // int length = sizeof(root[jsonCommandKeys[i]]);
-          // while (jsonRXdoc[jsonCommandKeys[i]][length] != "\0" ){
-          //    length++;
-          //   std::cout << "counting . . . " << length  << std::endl;
-          // }
-          // std::cout << "length:" << length << std::endl;
-
-         // databuffer[15] = "\n";
-          //  snprintf(databuffer, "%.15s\0", root[jsonCommandKeys[i]]);
-          //  snprintf(jsonRX_data.msg, "%.15s\0", root[jsonCommandKeys[i]]);
-          //strcpy(jsonRX_data.msg, jsonRXdoc[jsonCommandKeys[i]]);  // This does allow string overloading and CANNOT BE CONSIDERED SAFE
-         // jsonRX_data.msg[15] = "\n";
+        } else if (data_type == CHAR_ARRAY) { 
+          const char* extracted = jsonRXdoc[jsonCommandKeys[i]].as<const char*>();  // 
+          memcpy(databuffer, extracted, 16);
+          memcpy(jsonRX_data.msg, extracted, 16);
+          databuffer[15] = '\0';
+          jsonRX_data.msg[15] = '\0';
           jsonRX_data.data_type = CHAR_ARRAY;
-
         } else {
-          std::cout << "Exception in Data Type Definitions" << std::endl;
+          std::cout << F("Exception in Data Type Definitions") << std::endl;
         }
 
         // Debug Output from JSON parser
         //std::cout << "i = " << i << " cmd: " << jsonCommandKeys[i] << " , Data type: " << typeNames[data_type] << std::endl;  //
         char buffer[64];
         sprintf(buffer, "i = %i, cmd: %s, data-type: %s, data: %s", i, jsonCommandKeys[i], typeNames[data_type], databuffer);
-        Serial.println(buffer);
-
-
+        std::cout << buffer << std::endl;
         return jsonRX_data;  // return the structure as the data has been extracted
       } else {
         // root did not contain key, but command could be further analysed to see if any other data

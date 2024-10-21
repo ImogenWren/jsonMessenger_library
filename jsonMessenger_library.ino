@@ -13,6 +13,19 @@ Version V0.0.0
 */
 
 
+/* Version V0.0.0
+Sketch uses 15604 bytes (50%) of program storage space. Maximum is 30720 bytes.
+Global variables use 843 bytes (41%) of dynamic memory, leaving 1205 bytes for local variables. Maximum is 2048 bytes.
+- Without Sprintf outside library
+- Just about functional within library, but non functional outside library
+
+
+// With sprintf
+Sketch uses 15936 bytes (51%) of program storage space. Maximum is 30720 bytes.
+Global variables use 1097 bytes (53%) of dynamic memory, leaving 951 bytes for local variables. Maximum is 2048 bytes.
+*/
+
+
 #include "jsonMessenger.h"
 #include <autoDelay.h>
 //#include <ArduinoSTL.h>  // [Arduino Library Manager]
@@ -43,7 +56,7 @@ void setup() {
 //  ram.begin();
 //  ram.getPrintStats("setup");
   jsonRX.jsonBegin();
-  Serial.println("end of setup");
+  Serial.println(F("end of setup"));
 }
 
 
@@ -60,9 +73,11 @@ void loop() {
 
   jsonStateData nextState = jsonRX.jsonReadSerialLoop();
 
- /* 
+  
   if (nextState.cmd_received) {  // If command is received
-    char buffer[64];
+  //std::cout << ("command parsed by jsonMessenger") << std::endl;
+    char printbuffer[128];
+   // strcpy(printbuffer, "  Command Received, Data: ");
     char databuffer[16];
     if (nextState.data_type == EMPTY) {
       strcpy(databuffer, "No Data");
@@ -71,17 +86,20 @@ void loop() {
     } else if (nextState.data_type == FLOAT) {
       dtostrf(nextState.data, 2, 2, databuffer);
     } else if (nextState.data_type == CHAR_ARRAY) {
-      strcpy(databuffer, nextState.msg);
+    strcpy(databuffer, nextState.msg);
     } else {
       std::cout << "Exception in Returned Data" << std::endl;
     }
-    sprintf(buffer, "cmd: %s, data_type: %s, data: %s, ", jsonCommandKeys[nextState.cmdState],  typeNames[nextState.data_type], databuffer);
-    // std::cout << buffer << std::endl;
-    Serial.println(buffer);
+   // strcat(jsonCommandKeys[nextState.cmdState], printbuffer);
+  // Serial.println(nextState.cmdState);
+   // strcat(printbuffer, databuffer);
+ // snprintf(printbuffer, 64, "cmd: %s, data_type: %s, data: %s", nextState.cmdState,  nextState.data_type, databuffer);
+  //  std::cout << printbuffer << std::endl;
+   // Serial.println(printbuffer);
   }
-*/
+
   if (printDelay.millisDelay(5000)) {
  //   ram.getPrintStats("loop");
-    Serial.println("Alive and Loop");
+    Serial.println(F("Alive and Loop"));
   }
 }
