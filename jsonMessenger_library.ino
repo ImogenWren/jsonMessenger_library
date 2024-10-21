@@ -14,15 +14,18 @@ Version V0.0.0
 
 
 /* Version V0.0.0
-Sketch uses 15604 bytes (50%) of program storage space. Maximum is 30720 bytes.
-Global variables use 843 bytes (41%) of dynamic memory, leaving 1205 bytes for local variables. Maximum is 2048 bytes.
-- Without Sprintf outside library
-- Just about functional within library, but non functional outside library
+Sketch uses 14690 bytes (47%) of program storage space. Maximum is 30720 bytes.
+Global variables use 831 bytes (40%) of dynamic memory, leaving 1217 bytes for local variables. Maximum is 2048 bytes.
+- working apart from looking up the state name back as a string
+- likewise with data type
 
 
-// With sprintf
-Sketch uses 15936 bytes (51%) of program storage space. Maximum is 30720 bytes.
-Global variables use 1097 bytes (53%) of dynamic memory, leaving 951 bytes for local variables. Maximum is 2048 bytes.
+Sketch uses 14896 bytes (48%) of program storage space. Maximum is 30720 bytes.
+Global variables use 1005 bytes (49%) of dynamic memory, leaving 1043 bytes for local variables. Maximum is 2048 bytes.
+- 174 more bytes just because of     Serial.print(jsonCommandKeys[next_state]);
+- brings it into global scope?
+
+
 */
 
 
@@ -53,8 +56,8 @@ struct jsonStateData {
 
 void setup() {
   Serial.begin(115200);
-//  ram.begin();
-//  ram.getPrintStats("setup");
+  //  ram.begin();
+  //  ram.getPrintStats("setup");
   jsonRX.jsonBegin();
   Serial.println(F("end of setup"));
 }
@@ -73,33 +76,46 @@ void loop() {
 
   jsonStateData nextState = jsonRX.jsonReadSerialLoop();
 
-  
+
   if (nextState.cmd_received) {  // If command is received
-  //std::cout << ("command parsed by jsonMessenger") << std::endl;
-    char printbuffer[128];
-   // strcpy(printbuffer, "  Command Received, Data: ");
-    char databuffer[16];
+
+
+
+    //char printbuffer[128];
+    // strcpy(printbuffer, "  Command Received, Data: ");
+    char loopdatabuffer[16];
     if (nextState.data_type == EMPTY) {
-      strcpy(databuffer, "No Data");
-    } else if (nextState.data_type == INTEGER) {  // Example of how to deal with different datatypes returned from jsonMessenger object
-      itoa(nextState.numeric, databuffer, 10);    // 10: base 10 // If integer copy integer to string
+      strcpy(loopdatabuffer, "No Data");
+    } else if (nextState.data_type == INTEGER) {    // Example of how to deal with different datatypes returned from jsonMessenger object
+      itoa(nextState.numeric, loopdatabuffer, 10);  // 10: base 10 // If integer copy integer to string
     } else if (nextState.data_type == FLOAT) {
-      dtostrf(nextState.data, 2, 2, databuffer);
+      dtostrf(nextState.data, 2, 2, loopdatabuffer);
     } else if (nextState.data_type == CHAR_ARRAY) {
-    strcpy(databuffer, nextState.msg);
+      strcpy(loopdatabuffer, nextState.msg);
     } else {
       std::cout << "Exception in Returned Data" << std::endl;
     }
-   // strcat(jsonCommandKeys[nextState.cmdState], printbuffer);
-  // Serial.println(nextState.cmdState);
-   // strcat(printbuffer, databuffer);
- // snprintf(printbuffer, 64, "cmd: %s, data_type: %s, data: %s", nextState.cmdState,  nextState.data_type, databuffer);
-  //  std::cout << printbuffer << std::endl;
-   // Serial.println(printbuffer);
+
+    jsonRX.printCMDkey(nextState.cmdState);
+   // Serial.print(jsonCommandKeys[next_state]);
+    Serial.print(" cmd Received, Data Type: ");
+    // Serial.print(typeNames[next_type]);
+    jsonRX.printDataType(nextState.data_type);
+    Serial.print(" data: ");
+    Serial.println(loopdatabuffer);
+
+    // std::cout <<  nextState.cmdState << " command parsed, Data: " << loopdatabuffer << std::endl;
+
+    // strcat(jsonCommandKeys[nextState.cmdState], printbuffer);
+    // Serial.println(nextState.cmdState);
+    // strcat(printbuffer, databuffer);
+    // snprintf(printbuffer, 64, "cmd: %s, data_type: %s, data: %s", nextState.cmdState,  nextState.data_type, databuffer);
+    //  std::cout << printbuffer << std::endl;
+    // Serial.println(printbuffer);
   }
 
   if (printDelay.millisDelay(5000)) {
- //   ram.getPrintStats("loop");
+    //   ram.getPrintStats("loop");
     Serial.println(F("Alive and Loop"));
   }
 }

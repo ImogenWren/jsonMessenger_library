@@ -31,13 +31,12 @@ void jsonMessenger::printJSON(StaticJsonDocument<JSON_RX_SIZE> jsonDoc) {
 
 
 jsonStateData jsonMessenger::jsonReadSerialLoop() {
-  bool commandParsed = false;
-  int error = 0;
-  char command[JSON_RX_SIZE];
+  // bool commandParsed = false;
+  // int error = 0;
   jsonStateData jsonRX_data = { NONE, EMPTY, 0, 0.0, "", false };
 
-
   if (Serial.available() > 0) {
+    char command[JSON_RX_SIZE];
     // create JSON document
     StaticJsonDocument<JSON_RX_SIZE> jsonRXdoc;
 
@@ -45,6 +44,8 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
     Serial.readBytesUntil(10, command, JSON_RX_SIZE);  // 10 = "\n"
     Serial.print(F("\ncommand received: "));
     Serial.println(command);
+
+    Serial.read();  // clear any additional data left in the buffer
 
     // Analyse data
     deserializeJson(jsonRXdoc, command);
@@ -86,8 +87,8 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
           dtostrf(jsonRXdoc[jsonCommandKeys[i]], 2, 2, databuffer);
           jsonRX_data.data = jsonRXdoc[jsonCommandKeys[i]].as<float>();
           jsonRX_data.data_type = FLOAT;
-        } else if (data_type == CHAR_ARRAY) { 
-          const char* extracted = jsonRXdoc[jsonCommandKeys[i]].as<const char*>();  // 
+        } else if (data_type == CHAR_ARRAY) {
+          const char* extracted = jsonRXdoc[jsonCommandKeys[i]].as<const char*>();  //
           memcpy(databuffer, extracted, 16);
           memcpy(jsonRX_data.msg, extracted, 16);
           databuffer[15] = '\0';
@@ -99,14 +100,27 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
 
         // Debug Output from JSON parser
         //std::cout << "i = " << i << " cmd: " << jsonCommandKeys[i] << " , Data type: " << typeNames[data_type] << std::endl;  //
-        char buffer[64];
-        sprintf(buffer, "i = %i, cmd: %s, data-type: %s, data: %s", i, jsonCommandKeys[i], typeNames[data_type], databuffer);
-        std::cout << buffer << std::endl;
+
+        // these should only be for debugging anyway
+        //  char buffer[64];
+        //   sprintf(buffer, "i = %i, cmd: %s, data-type: %s, data: %s", i, jsonCommandKeys[i], typeNames[data_type], databuffer);
+        ///   std::cout << buffer << std::endl;
         return jsonRX_data;  // return the structure as the data has been extracted
       } else {
         // root did not contain key, but command could be further analysed to see if any other data
+        //std::cout << "Key not found in JSON root" << std::endl;
       }
     }
   }
   return jsonRX_data;
+}
+
+
+
+void jsonMessenger::printCMDkey(jsonStates state) {
+  std::cout << jsonCommandKeys[state] << "\0";
+}
+
+void jsonMessenger::printDataType(dataTypes type) {
+  std::cout << typeNames[type] << "\0";
 }

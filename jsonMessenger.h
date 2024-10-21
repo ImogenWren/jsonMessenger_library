@@ -45,7 +45,7 @@ private:
   //# JSON Varibles & Object Declaration
   // These variables relate to incoming serial commands
   // was 64 reduced to save space
- // StaticJsonDocument<JSON_RX_SIZE> jsonRXdoc;  // This is the JSON object
+  // StaticJsonDocument<JSON_RX_SIZE> jsonRXdoc;  // This is the JSON object
   //JsonDocument doc;  // This version for V7.x.x Dynamically assigned memory
 
 
@@ -61,11 +61,11 @@ public:
   void printJSON(StaticJsonDocument<JSON_RX_SIZE> jsonDoc);  // Prints the static jsonRXdoc
 
 
+  void printCMDkey(jsonStates state);  // to print the state in human readable form without coping the entire list of keys to global scope
 
+  void printDataType(dataTypes type);
 
-private:
-
-
+    private:
 };
 
 
