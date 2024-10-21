@@ -4,8 +4,9 @@ _Library to simplify two way communication over Serial interfaces using JSON for
 Imogen Heard
 17/10/24
 
+Please see: https://github.com/ImogenWren/jsonMessenger_library for latest version and usage instructions
 
-Version V0.0.0
+Version V1.0.0
 - Focus on receiving & parsing incoming Serial messages in JSON format
 
 
