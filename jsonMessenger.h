@@ -10,6 +10,8 @@ Version V1.0.0
 - Focus on receiving & parsing incoming Serial messages in JSON format
 
 
+
+
 */
 
 //#pragma once
@@ -32,22 +34,27 @@ Version V1.0.0
 
 
 
-//extern char jsonCommandKeys[][4];
+/*
+#if COMMAND_HINTS == true
+char exampleCommands[][32] = {
+  "{\"mode\":\"stop\"}",
+  "{\"set\":\"mode\",\"to\":\"stop\"}",
+  "{\"heater\":0}",
+  "{\"heater\":1}",
+  "{\"set\":\"heater\",\"val\":0}",
+  "{\"flow\":0}",
+  "{\"flow\":50}",
+  "{\"set\":\"flow\",\"value\":75}",
+};
+#endif
+*/
 
 
 
-// These variables relate to the JSON report that is printed to serial monitor to report sensor data & all statuses to UI
-//#define JSON_TX_SIZE 620
-//StaticJsonDocument<JSON_TX_SIZE> jsonTX;
 
 
 class jsonMessenger {
 private:
-  //# JSON Varibles & Object Declaration
-  // These variables relate to incoming serial commands
-  // was 64 reduced to save space
-  // StaticJsonDocument<JSON_RX_SIZE> jsonRXdoc;  // This is the JSON object
-  //JsonDocument doc;  // This version for V7.x.x Dynamically assigned memory
 
 
 
@@ -59,14 +66,29 @@ public:
 
   jsonStateData jsonReadSerialLoop();  // function needs to be called periodically to accept incoming serial messages, parse & return jsonStateData with new state /and data required for new state
 
-  void printJSON(StaticJsonDocument<JSON_RX_SIZE> jsonDoc);  // Prints the static jsonRXdoc
+  void printJSON(StaticJsonDocument<JSON_RX_SIZE> *jsonDoc);  // Prints the static jsonRXdoc
 
 
   void printCMDkey(jsonStates state);  // to print the state in human readable form without coping the entire list of keys to global scope
 
   void printDataType(dataTypes type);
 
-    private:
+  void printJSONdata(jsonStateData *data);
+
+  int8_t enque_cmd(jsonStateData *newItem);  // Returns the number of items in the queue, or -1 on fail
+
+  jsonStateData dequeue_cmd();  // returns first queue item or 0 if queue is empty when called
+
+
+
+
+
+private:
+
+
+
+  jsonStateData jsonQueue[CMD_QUEUE_LENGTH];
+  int8_t queue_size = 0;  // must be managed "manually"
 };
 
 

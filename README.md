@@ -11,7 +11,16 @@ a list of the expected variable types to be sent along with the defined keywords
  ## Use
  _This library is configured for different users entirely within the `jsonConfig.h` file._
 
+
 ### Modifying jsonConfig.h
+
+0. User Options:
+ _Various options are provided to the user for different use cases and hardware available_
+
+ // Some stuff about the queue system
+
+
+
  1. Define an enum to define variable types, These will be linked to a state enum so when a message with a keyword is received, we can look up what 
  data type will be included with the message
  ```

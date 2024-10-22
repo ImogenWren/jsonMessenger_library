@@ -1,11 +1,12 @@
 /*  jsonConfig.h
 
-This header should be used with the jsonMessenger library to define all the working states & commands that can be decoded by the jsonMessenger system.
+This header should be used with the jsonMessenger library to define all the working states & commands that can be decoded by the jsonMessenger system
 
-Please see the README.md file to explain how it works!
+Please see: https://github.com/ImogenWren/jsonMessenger_library for latest version and usage instructions
 
 Imogen Heard
 21/10/2024
+
 
 */
 
@@ -19,7 +20,29 @@ Imogen Heard
 #include <map>                     // [std::map]
 
 
-#define JSON_RX_SIZE 48
+#define JSON_USE_QUEUE true            //At least one of these should be true
+#define JSON_USE_SINGLE_FRAME false    // Single frame is always valid, but this can be used to disable features not wanted when using queue
+
+#define JSON_RX_SIZE 32            // 32 Working on Arduino Nano
+#define CMD_QUEUE_LENGTH 3         // 3 Working on Arduino Nano
+#define JSON_MSG_LENGTH 8          // Length of msg array in json data structure
+
+// Define an enum to define variable types, These will be linked to a state enum so when a keyword is received, we can look up what data type should be sent with it
+typedef enum {  // enum to pass variable types between functions
+  EMPTY,
+  INTEGER,
+  FLOAT,
+  CSTRING
+} dataTypes;
+
+// For human readability of enum above
+static char typeNames[][8] = {
+  "EMPTY",
+  "INTEGER",
+  "FLOAT",
+  "CSTRING"
+};
+
 
 // Define list of typical commands for system for future reference
 /*
@@ -27,27 +50,8 @@ Imogen Heard
 {"A1": 98}
 {"all": "stop"}
 {"all":0}
+
 */
-
-
-
-// Define an enum to define variable types, These will be linked to a state enum so when a keyword is received, we can look up what data type should be sent with it
-typedef enum {  // enum to pass variable types between functions
-  EMPTY,
-  INTEGER,
-  FLOAT,
-  CHAR_ARRAY
-} dataTypes;
-
-// For human readability of enum above
-static char typeNames[][12] = {
-  "EMPTY",
-  "INTEGER",
-  "FLOAT",
-  "CHAR_ARRAY"
-};
-
-
 
 
 // Declare a list of all possible key values as ENUM. These values will be passed out of the jsonMessenger Object and can be used to go to different states
@@ -86,18 +90,6 @@ typedef enum {
 } jsonStates;
 
 
-// Then Declare a list of key commands that will be required to be parsed. This must match the order of the enums above
-static char jsonCommandKeys[][5] = {
-  "none",
-  "A0", "A1", "A2", "A3", "A4",
-  "B0", "B1", "B2", "B3", "B4",
-  "C0", "C1", "C2", "C3", "C4",
-  "D0", "D1", "D2", "D3", "D4",
-  "E0", "E1", "E2", "E3", "E4",
-  "all", "mod", "usr"
-};
-// NOTE, this can also be used to turn the enums above back into strings for human readability
-
 // Now Link each jsonState ENUM with the datatype ENUM in a map structure.
 //In this example most will be integers, but will include some cstrings to test
 const std::map<jsonStates, dataTypes> jsonStateMap = {
@@ -129,15 +121,25 @@ const std::map<jsonStates, dataTypes> jsonStateMap = {
   { jsonStates::FAN_E4, dataTypes::INTEGER },
   { jsonStates::ALL, dataTypes::INTEGER },
   { jsonStates::MOD, dataTypes::FLOAT },
-  { jsonStates::USR, dataTypes::CHAR_ARRAY }
+  { jsonStates::USR, dataTypes::CSTRING }
 };
 
 
-
+// Then Declare a list of key commands that will be required to be parsed. This must match the order of the enums above
+static char jsonCommandKeys[][4] = {
+  "na",
+  "A0", "A1", "A2", "A3", "A4",
+  "B0", "B1", "B2", "B3", "B4",
+  "C0", "C1", "C2", "C3", "C4",
+  "D0", "D1", "D2", "D3", "D4",
+  "E0", "E1", "E2", "E3", "E4",
+  "all", "mod", "usr"
+};
+// NOTE, this can also be used to turn the enums above back into strings for human readability
 
 // Also including generic keys, these are used for more verbose JSON commands like:
 // {"set": "item", "to":"value"}
-static char jsonGenerics[][6] = {
+static char jsonGenerics[][5] = {
   "NULL",
   "set",
   "to",
@@ -151,11 +153,13 @@ static char jsonGenerics[][6] = {
 struct jsonStateData {
   jsonStates cmdState;        // The command state enum to tell state machine what state to go to next
   dataTypes data_type;        // The type of data being passed along with structure (though state should know what data to expect anyway), this could be removed to save space
-  int numeric;                // empty generic data slots for each data type
+  int16_t numeric;                // empty generic data slots for each data type
   float data;
-  char msg[16];
+  char msg[JSON_MSG_LENGTH];
   bool cmd_received;           // Flag set true by jsonLoop when cmd is received
 };
+
+
 
 
 
