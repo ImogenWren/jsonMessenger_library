@@ -138,6 +138,7 @@ void jsonMessenger::printJSONdata(jsonStateData *data) {  // Use -> to assess me
 }
 
 
+#if JSON_USE_QUEUE == true
 // Returns the number of items in the queue, or -1 on fail
 int8_t jsonMessenger::enque_cmd(jsonStateData *newItem) {
   Serial.print(F("enque -> length:  "));
@@ -151,9 +152,10 @@ int8_t jsonMessenger::enque_cmd(jsonStateData *newItem) {
     return -1;
   }
 }
+#endif
 
 
-
+#if JSON_USE_QUEUE == true
 // returns first queue item or 0 if queue is empty when called
 jsonStateData jsonMessenger::dequeue_cmd() {
   jsonStateData first_item = { NONE, EMPTY, 0, 0.0, "", false };
@@ -172,3 +174,4 @@ jsonStateData jsonMessenger::dequeue_cmd() {
     return first_item;
   }
 }
+#endif

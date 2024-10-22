@@ -75,20 +75,19 @@ public:
 
   void printJSONdata(jsonStateData *data);
 
+#if JSON_USE_QUEUE == true
   int8_t enque_cmd(jsonStateData *newItem);  // Returns the number of items in the queue, or -1 on fail
 
   jsonStateData dequeue_cmd();  // returns first queue item or 0 if queue is empty when called
-
-
-
-
+#endif
 
 private:
 
-
-
+#if JSON_USE_QUEUE == true
   jsonStateData jsonQueue[CMD_QUEUE_LENGTH];
   int8_t queue_size = 0;  // must be managed "manually"
+#endif
+
 };
 
 
