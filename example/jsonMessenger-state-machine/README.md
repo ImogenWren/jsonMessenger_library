@@ -158,7 +158,7 @@ void sm_state_template(jsonStateData stateData) {
 
 
 #### 6. Finally define the state machine function `sm_Run()`
-_A switch case structure calls each function based on the current `smState` variable_
+_A switch case structure calls each function based on the current `smState` variable_ <br>
 Note -> Automatically generate the switch case from the list of ENUM states and list of function prototypes! -> https://github.com/ImogenWren/switch-case-generator
 
 ```
@@ -210,14 +210,14 @@ void sm_Run(jsonStateData stateData) {
 
 
 ## 2. Modifying `jsonConfig.h`
-_This header should be used with the jsonMessenger library to define all the working states & commands that can be decoded by the jsonMessenger system._
+_This header should be used with the jsonMessenger library to define all the working states & commands that can be decoded by the jsonMessenger system._ <br>
 This library is designed to parse commands recieved via the Serial object in Arduino. Commands should be formatted in CMD:VALUE pairs as follows:
 
 #### Version 1 -> succinct command structure
 `{"CMD":"VALUE"}` -> for CMDs with passed values  <br>
 or <br>
-`{"CMD":}` -> for CMDs with no additional values <br>
-note: in the 2nd example, any data entered after `:` will be ignored, as we have already defined the datatypes that will be passed with each command to the parser.
+`{"CMD":0}` -> for CMDs with no additional values <br>
+note: in the 2nd example, any data entered after `:` will be ignored, as we have already defined the datatypes that will be passed with each command to the parser, however some value should be included to prevent the deserialization function from throwing errors (though it will often execute correctly even if no dummy value is included)
 
 #### Version 2 -> Verbose command structure
 `{"set":"CMD","to":"VALUE"}` -> for CMDs with passed values  <br>
