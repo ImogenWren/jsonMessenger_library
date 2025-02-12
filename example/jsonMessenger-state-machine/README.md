@@ -1,4 +1,4 @@
-# dynamics-lab-firmware
+# jsonMessenger State Machine Example
 _Example State Machine with JSON Command Parsing & Error Reporting_
 
 ## Commands list
