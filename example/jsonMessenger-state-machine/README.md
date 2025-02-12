@@ -227,7 +227,7 @@ or  <br>
 As the libary works via parsing JSON structures, any additional key:value pairs will simply be ignored, as long as the overal JSON structure is validated, the parser will just look
 for the existance of matching keys, and ignore anything else. <br>
 
-All modifications should be carried out in this header file `jsonConfig.h`, please do not modify jsonMessenger.h or jsonMessenger.cpp!
+All modifications should be carried out in this header file `jsonConfig.h`, please do not modify jsonMessenger.h or jsonMessenger.cpp! (unless you have to)
 
 
 #### 1. Define an enum to define variable types
