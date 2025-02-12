@@ -134,9 +134,58 @@ void sm_state_init() {
   smState = STATE_WAIT;
 }
 
+
+// Doing this doesnt actually save any RAM compared to having F macro strings within a function. 
+const char cmd_0[] PROGMEM = "{\"start\":0}           -> Start/Update Motor Speed";
+const char cmd_1[] PROGMEM = "{\"stop\":0}            -> Stop Motor";
+const char cmd_2[] PROGMEM = "{\"hz\": -20 to 20}     -> Set Motor Speed in Hz";
+const char cmd_3[] PROGMEM = "{\"rpm\": -200 to 200}  -> Set Motor Speed in RPM";
+const char cmd_4[] PROGMEM = "{\"home\":}             -> Move Motor to home pos";
+const char cmd_5[] PROGMEM = "{\"cal\":}              -> Run Calibration to home motor";
+const char cmd_6[] PROGMEM = "{\"free\":}             -> Set freewheel brake mode (test)";
+const char cmd_7[] PROGMEM = "{\"brake\":}            -> Set coolbrake brake mode (test)";
+const char cmd_8[] PROGMEM = "{\"goto\": -360 to 360} -> Goto Angle (test)";
+const char cmd_9[] PROGMEM = "{\"sample\": 1 to 40}   -> Set Samplerate in Hz";
+const char cmd_10[] PROGMEM = "{\"stream\":}           -> Start Data Streaming";
+const char cmd_11[] PROGMEM = "{\"endst\":}            -> End Data Streaming";
+const char cmd_12[] PROGMEM = "{\"snap\":}             -> Take Data Snapshot";
+const char cmd_13[] PROGMEM = "{\"time\": 1 - 250000 } -> Set Time for Data Snapshot (mS)";
+const char cmd_14[] PROGMEM = "{\"ping\":}             -> Ping Servo";
+const char cmd_15[] PROGMEM = "{\"help\":}             -> Print Commands to Serial Monitor";
+
+#define LONGEST_STRING 59
+#define LIST_LENGTH 16
+
+const char *const cmd_table[] PROGMEM = {
+  cmd_0,
+  cmd_1,
+  cmd_2,
+  cmd_3,
+  cmd_4,
+  cmd_5,
+  cmd_6,
+  cmd_7,
+  cmd_8,
+  cmd_9,
+  cmd_10,
+  cmd_11,
+  cmd_12,
+  cmd_13,
+  cmd_14,
+  cmd_15
+};
+
+
 //https://forum.arduino.cc/t/using-large-text/248390/7
 // Not a state, but function called by "help" state to print commands list to users
 void print_cmds() {
+  char buffer[LONGEST_STRING + 1];
+  for (int i = 0; i < LIST_LENGTH; i++) {
+    strcpy_P(buffer, (char *)pgm_read_ptr(&(cmd_table[i])));  // Necessary casts and dereferencing, just copy.
+    Serial.println(buffer);
+  }
+}
+/*
   Serial.println(F("   {\"start\":0}          -> Start/Update Motor Speed"));
   Serial.println(F("   {\"stop\":0}           -> Stop Motor              "));
   Serial.println(F("   {\"hz\": -20 to 20}    -> Set Motor Speed in Hz   "));
@@ -153,8 +202,9 @@ void print_cmds() {
   Serial.println(F("   {\"time\": 1 - 250000 }-> Set Time for Data Snapshot (mS)  "));     // Change the time over which the data snapshot is taken
   Serial.println(F("   {\"ping\":\"\"}        -> Ping Servo               "));             // Ping the wobble-shaft with the servo
   Serial.println(F("   {\"help\":\"\"}        -> Print Commands to Serial Monitor    "));  // Print commands list
-}
 
+}
+*/
 
 // State Wait is the default state for this program
 void sm_state_wait() {

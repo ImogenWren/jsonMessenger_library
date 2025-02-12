@@ -51,9 +51,9 @@ char exampleCommands[][32] = {
 #endif
 */
 
-char jsonEnd[4] = {"\"}"};
+//char jsonEnd[4] = {"\"}"};
 
-//#define jsonEnd '\"}'
+
 
 
 class jsonMessenger {

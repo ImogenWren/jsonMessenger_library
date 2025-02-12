@@ -51,7 +51,7 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
 
     Serial.print(F("{\"rxed\": \""));
     Serial.print(command);
-    Serial.println(jsonEnd);
+    Serial.println("\"}");
 
     //Serial.read();  // clear any additional data left in the buffer
 
@@ -70,7 +70,7 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
 
     bool set_keyword_used = false;  // Make the assumption that set keyword has not been used,
 
-    const char *keyString;  // If the root contains "set" -> preload value (which contains key) into valueString and compare this along with root.key in loop below (2 birds, 1 stone)
+    const char *keyString = {""};  // If the root contains "set" -> preload value (which contains key) into valueString and compare this along with root.key in loop below (2 birds, 1 stone)
     if (root.containsKey("set")) {
       keyString = jsonRXdoc["set"];
       set_keyword_used = true;  // if set has been used, then we need to extract the data in a slightly different way

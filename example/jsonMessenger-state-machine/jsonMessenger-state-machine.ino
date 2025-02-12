@@ -9,20 +9,13 @@ Imogen Heard
 */
 
 /* Version Control 
-Sketch uses 19708 bytes (64%) of program storage space. Maximum is 30720 bytes.
-Global variables use 2223 bytes (108%) of dynamic memory, leaving -175 bytes for local variables. Maximum is 2048 bytes.
 
-Sketch uses 19708 bytes (64%) of program storage space. Maximum is 30720 bytes.
-Global variables use 2211 bytes (107%) of dynamic memory, leaving -163 bytes for local variables. Maximum is 2048 bytes.
+Sketch uses 20000 bytes (62%) of program storage space. Maximum is 32256 bytes.
+Global variables use 1649 bytes (80%) of dynamic memory, leaving 399 bytes for local variables. Maximum is 2048 bytes.
 
-Sketch uses 19674 bytes (64%) of program storage space. Maximum is 30720 bytes.
-Global variables use 2177 bytes (106%) of dynamic memory, leaving -129 bytes for local variables. Maximum is 2048 bytes.
 
-Sketch uses 19714 bytes (64%) of program storage space. Maximum is 30720 bytes.
-Global variables use 2163 bytes (105%) of dynamic memory, leaving -115 bytes for local variables. Maximum is 2048 bytes.
-
-Sketch uses 19720 bytes (64%) of program storage space. Maximum is 30720 bytes.
-Global variables use 2163 bytes (105%) of dynamic memory, leaving -115 bytes for local variables. Maximum is 2048 bytes.
+Sketch uses 20050 bytes (62%) of program storage space. Maximum is 32256 bytes.
+Global variables use 1703 bytes (83%) of dynamic memory, leaving 345 bytes for local variables. Maximum is 2048 bytes.
 
 
 */
@@ -40,8 +33,8 @@ Global variables use 2163 bytes (105%) of dynamic memory, leaving -115 bytes for
 
 void setup() {
   Serial.begin(115200);
-  delay(2000);  // give time for Serial object to start
-  // display_mallinfo();
+  while (!Serial);
+  // delay(2000);  // give time for Serial object to start
   //  std::cout << "\n{\"model\":\"" << EXPERIMENT_NAME << "\",\"version\":\"" << FIRMWARE_VERSION << "\",\"developed-by\":\"" << DEVELOPER << "\"}" << std::endl;
   Serial.print("\n{\"model\":\"");
   Serial.print(EXPERIMENT_NAME);

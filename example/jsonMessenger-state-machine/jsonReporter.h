@@ -9,10 +9,12 @@
 
 #include "globals.h"
 
+#define JSON_BUFFER_SIZE 200
 
 
 void update_json() {
   //freeRAM = ram.getPrintStats("update_json");
+  StaticJsonDocument<JSON_BUFFER_SIZE> jsonTX;
   // Header
   jsonTX[F("timestamp")].set(millis());  //Message Timestamp set this last before printing
                                          // Payload

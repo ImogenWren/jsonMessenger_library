@@ -19,9 +19,9 @@
 
 
 // Program Attributes
-#define EXPERIMENT_NAME 'jsonMessenger-state-machine-example'
-#define FIRMWARE_VERSION 'V0.0.0'
-#define DEVELOPER 'Imogen-Wren'
+#define EXPERIMENT_NAME "jsonMessenger-state-machine-example"
+#define FIRMWARE_VERSION "V0.0.0"
+#define DEVELOPER "Imogen-Wren"
 
 // Hardware Definitions
 #define HALL_SENSOR_PIN A4
@@ -50,8 +50,7 @@
 #define COMMAND_HINTS false
 
 
-#define JSON_BUFFER_SIZE 500
-StaticJsonDocument<JSON_BUFFER_SIZE> jsonTX;
+
 
 // Dummy Vals
 #define MAX_HZ 100
