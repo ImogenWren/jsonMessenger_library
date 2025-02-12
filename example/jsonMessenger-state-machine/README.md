@@ -1,5 +1,5 @@
 # dynamics-lab-firmware
-_Control a stepper motor and servo via JSON formatted command set. Gather data from position encoder and accellerometer mpu_
+_Example State Machine with JSON Command Parsing & Error Reporting_
 
 ## Commands list
 _List of basic commands in JSON format. This list is printed out on entry to STATE_WAIT and by entering STATE_HELP
