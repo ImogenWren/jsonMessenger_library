@@ -81,18 +81,18 @@ void sm_state_init(void);
 void sm_state_wait(void);
 void sm_state_stop(void);
 void sm_state_start(void);
-void sm_state_set_speed_hz(jsonStateData stateData);
-void sm_state_set_speed_rpm(jsonStateData stateData);
+void sm_state_set_speed_hz(jsonStateData *stateData);
+void sm_state_set_speed_rpm(jsonStateData *stateData);
 void sm_state_home(void);
 void sm_state_calibrate(void);
 void sm_state_freewheel(void);
 void sm_state_brake(void);
-void sm_state_goto(jsonStateData stateData);
-void sm_state_samplerate(jsonStateData stateData);
-void sm_state_start_stream(jsonStateData stateData);
+void sm_state_goto(jsonStateData *stateData);
+void sm_state_samplerate(jsonStateData *stateData);
+void sm_state_start_stream(jsonStateData *stateData);
 void sm_state_stop_stream(void);
 void sm_state_snapshot(void);
-void sm_state_snaptime(jsonStateData stateData);
+void sm_state_snaptime(jsonStateData *stateData);
 void sm_state_status(void);
 void sm_state_ping(void);
 void sm_state_help(void);
@@ -238,7 +238,6 @@ void sm_state_stop(void) {
 #endif
     lastState = smState;
   }
-
   smState = STATE_STOPSTREAM;
 }
 
@@ -259,19 +258,19 @@ void sm_state_start(void) {
 
 
 // Set the Motor Speed in Hz
-void sm_state_set_speed_hz(jsonStateData stateData) {
+void sm_state_set_speed_hz(jsonStateData *stateData) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
     Serial.println(F("state: SET_SPEED_HZ"));
 #endif
     lastState = smState;
   }
-  if (stateData.floatData < (-1 * MAX_HZ) || stateData.floatData > MAX_HZ) {  // if value is out of range, reject
+  if (stateData->floatData < (-1 * MAX_HZ) || stateData->floatData > MAX_HZ) {  // if value is out of range, reject
     errors.set_error(false, -10, 'Requested Hz value out of bounds', errors.WARNING, "set_speed_hz");
     errors.print_json_status(true);
   } else {
     Serial.print(F("{\"hz-set-to\":\""));
-    Serial.print(stateData.floatData);
+    Serial.print(stateData->floatData);
     Serial.println(F("\"}"));
   }
   smState = STATE_WAIT;
@@ -279,19 +278,19 @@ void sm_state_set_speed_hz(jsonStateData stateData) {
 
 
 // Set the Motor Speed in RPM
-void sm_state_set_speed_rpm(jsonStateData stateData) {
+void sm_state_set_speed_rpm(jsonStateData *stateData) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
     Serial.println(F("state: SET_SPEED_RPM"));
 #endif
     lastState = smState;
   }
-  if (stateData.floatData < (-1 * MAX_RPM) || stateData.floatData > MAX_RPM) {  // if value is out of range, reject
-    errors.set_error(false, -10, "Requested RPM value out of bounds", errors.WARNING, "set_speed_rpm");
+  if (stateData->floatData < (-1 * MAX_RPM) || stateData->floatData > MAX_RPM) {  // if value is out of range, reject
+    errors.set_error(false, -10, "RPM val out of bounds", errors.WARNING, "set_speed_rpm");
     errors.print_json_status(true);
   } else {
     Serial.print("{\"rpm-set-to\":\"");
-    Serial.print(stateData.floatData);
+    Serial.print(stateData->floatData);
     Serial.println("\"}");
   }
   smState = STATE_WAIT;
@@ -364,7 +363,7 @@ void sm_state_brake(void) {
 
 
 // Go to absolute angle (somewhat accurate if recently calibrated -> may take several rotations to find position)
-void sm_state_goto(jsonStateData stateData) {
+void sm_state_goto(jsonStateData *stateData) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
     Serial.println(F("state: GOTO"));
@@ -384,18 +383,18 @@ void sm_state_goto(jsonStateData stateData) {
 
 
 // Change the samplerate of streamed or snapshotted data (Init at 10 Hz)
-void sm_state_samplerate(jsonStateData stateData) {
+void sm_state_samplerate(jsonStateData *stateData) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
     Serial.println(F("state: SAMPLERATE"));
 #endif
     lastState = smState;
   }
-  if (stateData.numeric < 1 || stateData.numeric > 40) {
+  if (stateData->numeric < 1 || stateData->numeric > 40) {
     errors.set_error(false, -10, "Out of Bounds Sample Rate Commanded", errors.WARNING, "state-samplerate");
     errors.print_json_status();
   } else {
-    sampleRate_Hz = stateData.numeric;
+    sampleRate_Hz = stateData->numeric;
     sampleDelay_mS = 1000 / sampleRate_Hz;
   }
   smState = STATE_WAIT;
@@ -444,18 +443,18 @@ void sm_state_snapshot() {
 
 
 // Set the period over which snapshot data is recorded (init to 25 seconds)
-void sm_state_snaptime(jsonStateData stateData) {
+void sm_state_snaptime(jsonStateData *stateData) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
     Serial.println(F("state: SNAPTIME"));
 #endif
     lastState = smState;
   }
-  if (stateData.numeric < 1 || stateData.numeric > 250000) {
+  if (stateData->numeric < 1 || stateData->numeric > 50000) {
     errors.set_error(false, -10, "Out of Bounds Snapshot Time Commanded", errors.WARNING, "state-snaptime");
     errors.print_json_status();
   } else {
-    snapshot_timer_mS = stateData.numeric;
+    snapshot_timer_mS = stateData->numeric;
   }
   smState = STATE_WAIT;
 }
@@ -507,7 +506,7 @@ void sm_state_help(void) {
 
 // 6. Finally define the state machine function
 //    - Automatically generate the switch case from the list of ENUM states and list of functions! -> https://github.com/ImogenWren/switch-case-generator
-void sm_Run(jsonStateData stateData) {
+void sm_Run(jsonStateData *stateData) {
   if (smState < NUM_STATES) {
 #if DEBUG_STATE_MACHINE == true
     if (lastState != smState) {

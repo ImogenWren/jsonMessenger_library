@@ -24,8 +24,6 @@
 #define DEVELOPER "Imogen-Wren"
 
 // Hardware Definitions
-#define HALL_SENSOR_PIN A4
-#define HALL_NORMALLY_HIGH true  // define if normally high, triggered by low pulse (true) or normally low triggered by high pulse (false)
 
 // User Options & program config
 
@@ -46,9 +44,8 @@
 
 // Debugging Options
 #define DEBUG_STATES false
-#define DEBUG_STATE_MACHINE true
+#define DEBUG_STATE_MACHINE false
 #define COMMAND_HINTS false
-
 
 
 

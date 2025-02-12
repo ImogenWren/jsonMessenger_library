@@ -10,11 +10,9 @@ Imogen Heard
 
 /* Version Control 
 
-Sketch uses 16438 bytes (50%) of program storage space. Maximum is 32256 bytes.
-Global variables use 1490 bytes (72%) of dynamic memory, leaving 558 bytes for local variables. Maximum is 2048 bytes.
-
-Sketch uses 16446 bytes (50%) of program storage space. Maximum is 32256 bytes.
-Global variables use 1370 bytes (66%) of dynamic memory, leaving 678 bytes for local variables. Maximum is 2048 bytes.
+V1.0.0
+Sketch uses 15986 bytes (49%) of program storage space. Maximum is 32256 bytes.
+Global variables use 986 bytes (48%) of dynamic memory, leaving 1062 bytes for local variables. Maximum is 2048 bytes.
 
 
 */
@@ -68,7 +66,7 @@ void loop() {
     if (nextState_data.data_type == INTEGER) Serial.print(nextState_data.numeric);  //std::cout << nextState_data.numeric;
     if (nextState_data.data_type == FLOAT) Serial.print(nextState_data.floatData);  //std::cout << nextState_data.floatData;
     if (nextState_data.data_type == CSTRING) Serial.print(nextState_data.msg);      //std::cout << nextState_data.msg;
-    if (nextState_data.data_type == EMPTY) Serial.print("n/a");                     //std::cout << "n/a";
+    if (nextState_data.data_type == EMPTY) Serial.print(F("n/a"));                     //std::cout << "n/a";
     // Is this now missing float clause?
     //std::cout << "\"}" << std::endl;
     Serial.println(F("\"}"));
@@ -116,11 +114,10 @@ void loop() {
 
   //TODO Can this data be passed as a pointer to save some overheads?
 
-  sm_Run(nextState_data);  // This Runs the state machine in the correct state, and is passed all of the data sent by the last command
+  sm_Run(&nextState_data);  // This Runs the state machine in the correct state, and is passed all of the data sent by the last command
   // NOTE System design question here, passing this value as a local variable means it cannot be updated elsewhere. Making it global means that other states would be able to modify the data
   // and pass it internally.
-  // Skipping over this question, I am going to do the thing this would solve a different way
-  // sm_Run();
+
 
   // Run Periodic Functions to gather data here
 
@@ -138,11 +135,5 @@ void loop() {
     }
   }
 
-  errors.clear_warning();  // clear JSON (move this to bottom of loop later)
-                           //  if (printDelay.millisDelay(20000)) {
-                           // std::cout << "alive" << std::endl;
-                           //Serial.println("Alive and Loop");
-                           // display_mallinfo();
-                           //  stepper.setRPM(0);
-                           //}
+  errors.clear_warning();  
 }

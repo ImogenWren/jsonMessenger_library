@@ -53,7 +53,7 @@ char exampleCommands[][32] = {
 
 //char jsonEnd[4] = {"\"}"};
 
-
+#define CMD_QUEUE_LENGTH 10
 
 
 class jsonMessenger {
