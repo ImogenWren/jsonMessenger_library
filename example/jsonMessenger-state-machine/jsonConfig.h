@@ -88,7 +88,7 @@ static char typeNames[][8] = {
 // - Include a null value at 0 -> This is because this enum will be initialised at 0 to represent jsonMessenger not receiving data, or being unable to parse a command
 
 typedef enum {
-  NONE,                // Include null or none state
+  NONE,  // Include null or none state
   STOP,
   START,
   SET_SPEED_HZ,
@@ -104,8 +104,9 @@ typedef enum {
   SNAPSHOT,
   SNAPTIME,
   PING,
+  STATUS,
   HELP,
-  NUM_VALUES        // Add sentinal NUM_VALUES to count number of elements, this is very important and will be used to size for loops inside the jsonMessenger object
+  NUM_VALUES  // Add sentinal NUM_VALUES to count number of elements, this is very important and will be used to size for loops inside the jsonMessenger object
 } jsonStates;
 
 
@@ -129,6 +130,7 @@ const uint16_t jsonStateMap[NUM_VALUES][2] = {
   { jsonStates::SNAPSHOT, dataTypes::EMPTY },
   { jsonStates::SNAPTIME, dataTypes::INTEGER },
   { jsonStates::PING, dataTypes::EMPTY },
+  { jsonStates::STATUS, dataTypes::EMPTY },
   { jsonStates::HELP, dataTypes::EMPTY }
 };
 
@@ -153,6 +155,7 @@ static char jsonCommandKeys[][7] = {
   "snap",
   "time",
   "ping",
+  "status",
   "help"
 };
 // NOTE, this can also be used to turn the enums above back into strings for human readability

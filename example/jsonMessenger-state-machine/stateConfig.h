@@ -36,6 +36,7 @@ typedef enum {
   STATE_SNAPSHOT,
   STATE_SNAPTIME,
   STATE_PING,
+  STATE_STATUS,
   STATE_HELP,
   NUM_STATES  // Sentinal value lets us get the total number of states without manually counting. Do not forget this value, it is important for correct function
 } StateType;
@@ -68,6 +69,7 @@ char stateNames[][20] = {
   "STATE_STOPSTREAM",
   "STATE_SNAPSHOT",
   "STATE_SNAPTIME",
+  "STATE_STATUS",
   "STATE_PING",
   "STATE_HELP"
 };
@@ -91,6 +93,7 @@ void sm_state_start_stream(jsonStateData stateData);
 void sm_state_stop_stream(void);
 void sm_state_snapshot(void);
 void sm_state_snaptime(jsonStateData stateData);
+void sm_state_status(void);
 void sm_state_ping(void);
 void sm_state_help(void);
 
@@ -136,25 +139,27 @@ void sm_state_init() {
 
 
 // Doing this doesnt actually save any RAM compared to having F macro strings within a function. 
-const char cmd_0[] PROGMEM = "{\"start\":0}           -> Start/Update Motor Speed";
-const char cmd_1[] PROGMEM = "{\"stop\":0}            -> Stop Motor";
-const char cmd_2[] PROGMEM = "{\"hz\": -20 to 20}     -> Set Motor Speed in Hz";
-const char cmd_3[] PROGMEM = "{\"rpm\": -200 to 200}  -> Set Motor Speed in RPM";
-const char cmd_4[] PROGMEM = "{\"home\":}             -> Move Motor to home pos";
-const char cmd_5[] PROGMEM = "{\"cal\":}              -> Run Calibration to home motor";
-const char cmd_6[] PROGMEM = "{\"free\":}             -> Set freewheel brake mode (test)";
-const char cmd_7[] PROGMEM = "{\"brake\":}            -> Set coolbrake brake mode (test)";
-const char cmd_8[] PROGMEM = "{\"goto\": -360 to 360} -> Goto Angle (test)";
-const char cmd_9[] PROGMEM = "{\"sample\": 1 to 40}   -> Set Samplerate in Hz";
-const char cmd_10[] PROGMEM = "{\"stream\":}           -> Start Data Streaming";
-const char cmd_11[] PROGMEM = "{\"endst\":}            -> End Data Streaming";
-const char cmd_12[] PROGMEM = "{\"snap\":}             -> Take Data Snapshot";
-const char cmd_13[] PROGMEM = "{\"time\": 1 - 250000 } -> Set Time for Data Snapshot (mS)";
-const char cmd_14[] PROGMEM = "{\"ping\":}             -> Ping Servo";
-const char cmd_15[] PROGMEM = "{\"help\":}             -> Print Commands to Serial Monitor";
+// But its good to remind myself how this works
+const char cmd_0[] PROGMEM = "{\"start\":0}            -> Start/Update Motor Speed";
+const char cmd_1[] PROGMEM = "{\"stop\":0}             -> Stop Motor";
+const char cmd_2[] PROGMEM = "{\"hz\": -20 to 20}      -> Set Motor Speed in Hz";
+const char cmd_3[] PROGMEM = "{\"rpm\": -200 to 200}   -> Set Motor Speed in RPM";
+const char cmd_4[] PROGMEM = "{\"home\":0}             -> Move Motor to home pos";
+const char cmd_5[] PROGMEM = "{\"cal\":0}              -> Run Calibration to home motor";
+const char cmd_6[] PROGMEM = "{\"free\":0}             -> Set freewheel brake mode (test)";
+const char cmd_7[] PROGMEM = "{\"brake\":0}            -> Set coolbrake brake mode (test)";
+const char cmd_8[] PROGMEM = "{\"goto\": -360 to 360}  -> Goto Angle (test)";
+const char cmd_9[] PROGMEM = "{\"sample\": 1 to 40}    -> Set Samplerate in Hz";
+const char cmd_10[] PROGMEM = "{\"stream\":0}           -> Start Data Streaming";
+const char cmd_11[] PROGMEM = "{\"endst\":0}            -> End Data Streaming";
+const char cmd_12[] PROGMEM = "{\"snap\":0}             -> Take Data Snapshot";
+const char cmd_13[] PROGMEM = "{\"time\": 1 - 250000 }  -> Set Time for Data Snapshot (mS)";
+const char cmd_14[] PROGMEM = "{\"ping\":0}             -> Ping Servo";
+const char cmd_15[] PROGMEM = "{\"status\":0}           -> Print Status"; 
+const char cmd_16[] PROGMEM = "{\"help\":0}             -> Print Commands to Serial Monitor";
 
 #define LONGEST_STRING 59
-#define LIST_LENGTH 16
+#define LIST_LENGTH 17
 
 const char *const cmd_table[] PROGMEM = {
   cmd_0,
@@ -172,7 +177,8 @@ const char *const cmd_table[] PROGMEM = {
   cmd_12,
   cmd_13,
   cmd_14,
-  cmd_15
+  cmd_15,
+  cmd_16
 };
 
 
@@ -471,10 +477,24 @@ void sm_state_ping(void) {
 
 
 // Print the commands list to the Serial Output
+void sm_state_status(void) {
+  if (lastState != smState) {
+#if DEBUG_STATES == true
+    Serial.println(F("state: STATUS"));
+#endif
+    lastState = smState;
+  }
+  errors.print_json_status(true);
+  smState = STATE_WAIT;
+}
+
+
+
+// Print the commands list to the Serial Output
 void sm_state_help(void) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
-    Serial.println(F("state: help"));
+    Serial.println(F("state: HELP"));
 #endif
     lastState = smState;
   }
@@ -541,15 +561,18 @@ void sm_Run(jsonStateData stateData) {
         break;
       case STATE_PING:
         sm_state_ping();
-        break;
-      case STATE_HELP:
-        sm_state_help();
-        break;
+        break;      
       case STATE_SNAPSHOT:
         sm_state_snapshot();
         break;
       case STATE_SNAPTIME:
         sm_state_snaptime(stateData);
+        break;
+      case STATE_STATUS:
+        sm_state_status();
+        break;
+      case STATE_HELP:
+        sm_state_help();
         break;
       default:
         sm_state_stop();

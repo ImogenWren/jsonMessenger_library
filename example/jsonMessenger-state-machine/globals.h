@@ -63,7 +63,7 @@ autoDelay printDelay;  // Delay object for printing periodic JSON messages // DE
 errorRep errors;
 
 autoDelay sampleDelay;
-uint16_t sampleRate_Hz = 10;
+uint16_t sampleRate_Hz = 1;
 uint32_t sampleDelay_mS = 1000 / sampleRate_Hz;
 
 // Global Variables

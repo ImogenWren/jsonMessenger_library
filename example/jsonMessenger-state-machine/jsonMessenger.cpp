@@ -15,7 +15,7 @@ jsonMessenger::jsonMessenger() {
 
 
 void jsonMessenger::jsonBegin() {
- // Serial.begin(115200);
+  // Serial.begin(115200);
   Serial.println(F("{\"json\":\"messenger\",\"version\":\"V0.2.0\"}"));
 }
 
@@ -49,7 +49,14 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
     // Receive Command
     Serial.readBytesUntil(10, command, JSON_RX_SIZE);  // 10 = "\n"
 
-    Serial.print(F("{\"rxed\": \""));
+    for (int i = 0; i < JSON_RX_SIZE; i++) {
+      if (command[i] == '}') {
+        command[i + 1] = '\0';
+        break;
+      }
+    }
+
+    Serial.print(F("\n{\"rxed\": \""));
     Serial.print(command);
     Serial.println("\"}");
 
@@ -70,7 +77,7 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
 
     bool set_keyword_used = false;  // Make the assumption that set keyword has not been used,
 
-    const char *keyString = {""};  // If the root contains "set" -> preload value (which contains key) into valueString and compare this along with root.key in loop below (2 birds, 1 stone)
+    const char *keyString = { "" };  // If the root contains "set" -> preload value (which contains key) into valueString and compare this along with root.key in loop below (2 birds, 1 stone)
     if (root.containsKey("set")) {
       keyString = jsonRXdoc["set"];
       set_keyword_used = true;  // if set has been used, then we need to extract the data in a slightly different way
@@ -83,10 +90,12 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
 
       if (root.containsKey(jsonCommandKeys[i]) || strcmp(keyString, jsonCommandKeys[i]) == 0) {  // Match is found, i holds the correct ENUM reference for the state
 
-        Serial.print("{\"key\":\"");
+        Serial.print(F("{\"key\":\""));
         Serial.print(jsonCommandKeys[i]);
-        Serial.print("\",\"num\":\"");
+        Serial.print(F("\",\"enum\":\""));
         Serial.print(i);
+      
+
         // Serial.print("\"}");
         //Serial.println();
 
@@ -98,7 +107,7 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
         // new version using 2D array
         Serial.print(F("\",\"dataType\":\""));
         Serial.print(jsonStateMap[i][1]);
-        Serial.print("\",\"typeName\":\"");
+        Serial.print(F("\",\"typeName\":\""));
         Serial.print(typeNames[jsonStateMap[i][1]]);
         Serial.print("\",");
 
@@ -106,9 +115,9 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
 
 
         // Set the flags to trigger the state change
-        Serial.print("\"state\":\"");
+        Serial.print(F("\"state\":\""));
         Serial.print(jsonStateMap[i][0]);
-        Serial.print("\",");
+        Serial.print(F("\","));
 
         //  jsonRX_data.cmdState = i;  //
         jsonRX_data.cmdState = jsonStates(jsonStateMap[i][0]);  // these two lines should be identical, except one passes the ENUM, the other (the same) int value
@@ -161,6 +170,9 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
 #endif
         return jsonRX_data;  // return the structure as the data has been extracted
       } else {
+        if (i == NUM_VALUES-1) {  // if i = NUM_VALUES we have reached the end of the for loop, if no match has been found, print the unknown cmd
+          Serial.println(F("{\"cmd\":\"unknown\"}"));
+        }
         // We have pre-parsed the alternative set command so now else doesnt need to do anything
       }
     }

@@ -41,7 +41,7 @@ Imogen Heard
 
 
 // These variables relate to the JSON report that is printed to serial monitor to report sensor data & all statuses to UI
-#define JSON_BUFFER_SIZE 200
+#define JSON_BUFFER_SIZE 100
 #define DEBUG_ERRORS false
 #define ERROR_LEVEL_PRIORITY_ENABLE false
 #define WARNING_ACTIVE_PERIOD_mS 60000  // 1 min
@@ -61,13 +61,29 @@ public:
     FATAL
   } messageLevel;
 
-  char debugLevel[5][8] = {
+
+
+  const char debugLevel[5][8] = {
     "DEBUG",
     "INFO",
     "WARNING",
     "ERROR",
     "FATAL"
   };
+
+
+
+
+  struct errorStatus {
+    bool ok;
+    int16_t code;
+    char* msg;
+    messageLevel level;
+    char* context;
+    uint32_t logtime;
+  };
+
+  errorStatus currentStatus = {true, 0, "", INFO, ""};
 
   void print_json_status(bool printPretty = false);
   int get_message_level(const char* message_level);
@@ -84,7 +100,7 @@ public:
 
 private:
 
-  StaticJsonDocument<JSON_BUFFER_SIZE> JSONstatus;
+  
   int16_t last_warning_code = 0;
   uint32_t warning_set_time_mS;
 };
