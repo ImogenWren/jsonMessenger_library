@@ -8,6 +8,7 @@ To use this library:
 1. Download release and place folder into Arduino->libraries folder.
 2. Reload Arduino IDE and find examples under -> jsonMessenger_library
 3. Save examples with new name to modify for own use!
+4. See numbered instructions below for instructions on modifying headers for different uses.
 
 Note:
     _This template does not function like other libraries, as it relys on User Configureable header files to function correctly. <br> Therefore it is best to edit the examples, rather than just import the library into new sketches_
