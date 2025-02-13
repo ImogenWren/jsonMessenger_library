@@ -89,8 +89,8 @@ _The library is made up of several distinct parts_
 Please Find detailed instruction on use and modification of the user editable files, and the code required inside the loop() function below.
 
 # 1. Modifying `stateConfig.h`
-_Defines the state machine running constantly on the embedded system. Every potential state should be described in this user editable file_ Note: This template can be used on its own without jsonMessenger if
-the functions of the jsonMessenger libary are not required.
+_Defines the state machine running constantly on the embedded system. Every potential state should be described in this user editable file_ <br>
+Note: This template can be used on its own without jsonMessenger if the functions of the jsonMessenger libary are not required.
 
 
 ## 1. Define all the valid states for the state machine with an enum
