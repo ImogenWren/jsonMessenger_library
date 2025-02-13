@@ -83,7 +83,7 @@ and a list of the expected variable types to be sent along with the defined keyw
 _The library is made up of several distinct parts_
 1. `stateConfig.h` -> User Editable File: Defines the state machine running constantly on the embedded system. Every potential state should be described in this user editable file
 2. `jsonConfig.h`  -> User Editable File: Defines the user commands, datatypes and all states that can be triggered via the jsonMessenger system, but does not need to define any states that are not linked with a Serial command
-3. `jsonMessenger.h` -> jsonMessenger Library Header File, make sure to include this in `globals.h`. This file is not intended to be user editable, and can be placed in `libraries` along with `jsonMessenger.cpp`
+3. `jsonMessenger.h` -> jsonMessenger Library Header File,This file is not intended to be user editable, along with `jsonMessenger.cpp`
 4. `void loop() function` -> This function must call  `jsonMessenger::jsonReadSerialLoop();` and `sm_Run` and includes a small `if/if else` structure to tie jsonMessenger to the function of the state machine
 
 Please Find detailed instruction on use and modification of the user editable files, and the code required inside the loop() function below.
