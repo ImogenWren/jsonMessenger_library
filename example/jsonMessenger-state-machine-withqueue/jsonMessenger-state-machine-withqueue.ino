@@ -1,4 +1,4 @@
-/*  jsonMessenger State Machine - With Queue Example
+/*  jsonMessenger Library State Machine - With Queue Example
 
  Same as the other example contained in this library, however this version enables the queuing function for jsonMessenger
 
@@ -29,7 +29,8 @@ Global variables use 1637 bytes (79%) of dynamic memory, leaving 411 bytes for l
 V1.1.1 Fixed high memory useage due to loose strings in global
 Sketch uses 18576 bytes (57%) of program storage space. Maximum is 32256 bytes.
 Global variables use 1275 bytes (62%) of dynamic memory, leaving 773 bytes for local variables. Maximum is 2048 bytes.
-- NEEDS TESTING
+- Deployable version
+
 
 */
 
@@ -149,7 +150,7 @@ void loop() {
   if (streaming_active || snapshop_active) {
     if (sampleDelay.millisDelay(sampleDelay_mS)) {
       //print the sampled data
-      //update_json();
+      update_json();
       //  errors.print_json_status(true);
     }
     if (snapshop_active) {

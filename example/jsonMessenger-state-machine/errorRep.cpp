@@ -4,6 +4,8 @@
 
 // Constructor
 errorRep::errorRep() {
+
+  
 }
 
 

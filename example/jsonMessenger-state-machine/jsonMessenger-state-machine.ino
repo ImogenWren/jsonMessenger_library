@@ -1,8 +1,10 @@
-/*  jsonMessenger State Machine Example
+/*  jsonMessenger Library State Machine Example
+
+ State machine with JSON formatted command over Serial parsing
 
 Written By:
 Imogen Heard
-32/01/2025
+13/02/2025
 
 
 
@@ -10,9 +12,27 @@ Imogen Heard
 
 /* Version Control 
 
-V1.0.0
+V1.0.0 Without Queue
 Sketch uses 15986 bytes (49%) of program storage space. Maximum is 32256 bytes.
 Global variables use 986 bytes (48%) of dynamic memory, leaving 1062 bytes for local variables. Maximum is 2048 bytes.
+
+V1.1.0 With Queue
+Sketch uses 16666 bytes (51%) of program storage space. Maximum is 32256 bytes.
+Global variables use 1257 bytes (61%) of dynamic memory, leaving 791 bytes for local variables. Maximum is 2048 bytes.
+
+
+V1.1.0 Enabled State Machine debug
+Sketch uses 17124 bytes (53%) of program storage space. Maximum is 32256 bytes.
+Global variables use 1637 bytes (79%) of dynamic memory, leaving 411 bytes for local variables. Maximum is 2048 bytes.
+???? 380 more bytes?!
+
+V1.1.1 Fixed high memory useage due to loose strings in global
+Sketch uses 18576 bytes (57%) of program storage space. Maximum is 32256 bytes.
+Global variables use 1275 bytes (62%) of dynamic memory, leaving 773 bytes for local variables. Maximum is 2048 bytes.
+- Deployable version
+
+V1.1.1 Without Queing function
+
 
 
 */
@@ -47,12 +67,12 @@ void setup() {
 
 void loop() {
 
+  // If not using queue, jsonStateData is passed directly from jsonReadSerialLoop
+   jsonStateData nextState_data = jsonRX.jsonReadSerialLoop();
 
-  jsonStateData nextState_data = jsonRX.jsonReadSerialLoop();
 
 
-  if (nextState_data.cmd_received) {  // If command is receive   //delay(10);
-
+  if (nextState_data.cmd_received) {  // If command is received   
 
 
     const char* cmd = jsonRX.getCMDkey(nextState_data.cmdState);  // I feel like the entire point of using ENUMs is being totally lost by doing this, but it is working
@@ -66,7 +86,7 @@ void loop() {
     if (nextState_data.data_type == INTEGER) Serial.print(nextState_data.numeric);  //std::cout << nextState_data.numeric;
     if (nextState_data.data_type == FLOAT) Serial.print(nextState_data.floatData);  //std::cout << nextState_data.floatData;
     if (nextState_data.data_type == CSTRING) Serial.print(nextState_data.msg);      //std::cout << nextState_data.msg;
-    if (nextState_data.data_type == EMPTY) Serial.print(F("n/a"));                     //std::cout << "n/a";
+    if (nextState_data.data_type == EMPTY) Serial.print(F("n/a"));                  //std::cout << "n/a";
     // Is this now missing float clause?
     //std::cout << "\"}" << std::endl;
     Serial.println(F("\"}"));
@@ -125,8 +145,8 @@ void loop() {
   if (streaming_active || snapshop_active) {
     if (sampleDelay.millisDelay(sampleDelay_mS)) {
       //print the sampled data
-      //update_json();
-      errors.print_json_status(true);
+      update_json();
+      //  errors.print_json_status(true);
     }
     if (snapshop_active) {
       if (millis() - snapshot_starttime_mS >= snapshot_timer_mS) {
@@ -135,5 +155,5 @@ void loop() {
     }
   }
 
-  errors.clear_warning();  
+  errors.clear_warning();
 }

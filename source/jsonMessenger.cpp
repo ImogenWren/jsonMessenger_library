@@ -16,7 +16,7 @@ jsonMessenger::jsonMessenger() {
 
 void jsonMessenger::jsonBegin() {
   // Serial.begin(115200);
-  Serial.println(F("{\"json\":\"messenger\",\"version\":\"V1.1.1\"}"));
+  Serial.println(F("{\"json\":\"messenger\",\"version\":\"V1.0.0\"}"));
 }
 
 

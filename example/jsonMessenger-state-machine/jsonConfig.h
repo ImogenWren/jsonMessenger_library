@@ -7,8 +7,9 @@ This library is designed to parse commands recieved via the Serial object in Ard
 Version 1 -> succinct command structure
 `{"CMD":"VALUE"}` -> for CMDs with passed values
 or
-`{"CMD":} -> for CMDs with no additional values
-note: in the 2nd example, any data entered after : will be ignored, as we have already defined the datatypes that will be passed with each command to the parser
+`{"CMD":0} -> for CMDs with no additional values
+note: in the 2nd example, any data entered after : will be ignored, as we have already defined the datatypes that will be passed with each command to the parser,
+ however some data should be included to prevent errors in parsing JSON commands
 
 Version 2 -> Verbose command structure
 `{"set":"CMD","to":"VALUE"} -> for CMDs with passed values
@@ -22,7 +23,7 @@ for the existance of matching keys, and ignore anything else.
 Please see: https://github.com/ImogenWren/jsonMessenger_library for latest version and usage instructions, or follow the numbered comments for an
 explanation of how to modify this template for other uses. 
 
-All modifications should be carried out in this header file `jsonConfig.h`, please do not modify jsonMessenger.h or jsonMessenger.cpp!
+All modifications to jsonMessgender should be carried out in this header file `jsonConfig.h`, please do not modify jsonMessenger.h or jsonMessenger.cpp!
 
 Imogen Heard
 21/10/2024
@@ -37,26 +38,12 @@ Imogen Heard
 
 
 
-// As alternative to <map> data structure has been developed, this is all depreciated
-/*
-#ifdef __AVR__
-#include <ArduinoSTL.h>  // [Arduino Library Manager][Modified Version -> https://github.com/ImogenWren/ArduinoSTL]
-#pragma "ArduinoSTL Libary Included"
-#elif defined(STM32) || defined(ARDUINO_ARCH_STM32)
-#pragma "STM32 Board -> Using Arrays Instead of std::stl"
-#endif
-
-//#include <map>  // [std::map]
-*/
+#define JSON_USE_QUEUE false       //If true, library uses queueing, and jsonStateData should be passed from the dequeue function.
+                                    // if false, library will respond to each command individually and the jsonStateData is passed from jsonReadSerialLoop function
 
 
-
-#define JSON_USE_QUEUE false        //At least one of these should be true
-#define JSON_USE_SINGLE_FRAME true  // Single frame is always valid, but this can be used to disable features not wanted when using queue
-
-#define JSON_RX_SIZE 32     // 32 Working on Arduino Nano
-#define CMD_QUEUE_LENGTH 3  // 3 Working on Arduino Nano
-#define JSON_MSG_LENGTH 8   // Length of msg array in json data structure
+#define JSON_RX_SIZE 32     // Size of the buffer to hold incoming JSON formatted commands to be parsed
+#define JSON_MSG_LENGTH 12   // Length of msg array in json data structure
 
 
 // 1. Define an enum to define variable type used, These will be linked to a state enum so when a keyword is received, we can look up what data type should be sent with it
@@ -183,6 +170,7 @@ struct jsonStateData {
   bool cmd_received;  // Flag set true by jsonLoop when cmd is received
 };
 
+//jsonStateData emptyStruct_example = { NONE, EMPTY, 0, 0.0, "", false };  // commented out as global var would eat up extra memory. Instead of using this variable, just copy the example into local scope where needed
 
 
 

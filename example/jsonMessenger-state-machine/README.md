@@ -1,10 +1,12 @@
-# jsonMessenger State Machine Example
-_Example State Machine with JSON Command Parsing & Error Reporting_
+# jsonMessenger Library - Example State Machine
+_Control a generic state machine using JSON formatted commands sent & received via Serial communication. Received commands are parsed & directly command entry to a new state_
 
-## Commands list
-_List of basic commands in JSON format. This list is printed out by entering STATE_HELP
+## Example Commands list
+_List of basic commands in JSON format. This list is printed by entering STATE_HELP
 
 _Verbose Command Structure_
+`{"set":"CMD","to":"VALUE"}`
+
 ```
    {"set":"start"}                   -> Start/Update Motor Speed
    {"set":"stop"}                    -> Stop Motor              
@@ -23,28 +25,30 @@ _Verbose Command Structure_
    {"set":"ping"}                    -> Ping Servo               
    {"set":"help"}                    -> Print Commands to Serial Monitor 
 
-
 ```
 
 
 _Succinct Command Structure_
+`{"CMD":"VALUE"}` <br>
+`{"CMD":0}`  -> for null or n/a data
+
 ```
-   {"start":}          -> Start/Update Motor Speed
-   {"stop":}           -> Stop Motor              
+   {"start":0}          -> Start/Update Motor Speed
+   {"stop":0}           -> Stop Motor              
    {"hz": -20 to 20}    -> Set Motor Speed in Hz   
    {"rpm": -200 to 200} -> Set Motor Speed in RPM  
-   {"home":}        -> Move Motor to home pos (test) 
-   {"cal":}         -> Run Calibration to home motor 
-   {"free":}        -> Set freewheel brake mode (test)
-   {"brake":}       -> Set coolbrake brake mode (test)
+   {"home":0}        -> Move Motor to home pos (test) 
+   {"cal":0}         -> Run Calibration to home motor 
+   {"free":0}        -> Set freewheel brake mode (test)
+   {"brake":0}       -> Set coolbrake brake mode (test)
    {"goto": -360 to 360}-> Goto Angle (test)              
    {"sample": 1 to 40}  -> Set Samplerate in Hz         
-   {"stream":}      -> Start Data Streaming    
-   {"endst":}       -> End Data Streaming      
-   {"snap":}        -> Take Data Snapshot       
+   {"stream":0}      -> Start Data Streaming    
+   {"endst":0}       -> End Data Streaming      
+   {"snap":0}        -> Take Data Snapshot       
    {"time": 1 - 250000 }-> Set Time for Data Snapshot (mS)  
-   {"ping":}        -> Ping Servo               
-   {"help":}        -> Print Commands to Serial Monitor 
+   {"ping":0}        -> Ping Servo               
+   {"help":0}        -> Print Commands to Serial Monitor 
 
 ```
 
@@ -52,11 +56,11 @@ _Succinct Command Structure_
 
 
 
-# jsonMessenger_library
+# jsonMessenger_library -> How to Use
 _This library has been developed to simplify the development of embedded state machines with a JSON formatted command structure for sending commands and receiving data over a Serial interface_
 
-It works by associating different keywords used to define commands sent by a user or user interface, with a list of known states, that could represent all, or some of the various states of a state machine, and 
-a list of the expected variable types to be sent along with the defined keywords.
+It works by associating different keywords used to define commands sent by a user or user interface, with a list of known states, that could represent all, or some of the various states of a state machine,
+and a list of the expected variable types to be sent along with the defined keywords.
 
 
 
@@ -69,12 +73,12 @@ _The library is made up of several distinct parts_
 
 Please Find detailed instruction on use and modification of the user editable files, and the code required inside the loop() function below.
 
-## 1. Modifying `stateConfig.h`
+# 1. Modifying `stateConfig.h`
 _Defines the state machine running constantly on the embedded system. Every potential state should be described in this user editable file_ Note: This template can be used on its own without jsonMessenger if
 the functions of the jsonMessenger libary are not required.
 
 
-#### 1. Define all the valid states for the state machine with an enum
+## 1. Define all the valid states for the state machine with an enum
 //    - This should include all states triggered by user input, but may also contain states that are only accessable programatically
 ```
 typedef enum {
@@ -90,7 +94,7 @@ typedef enum {
 } StateType;
 ```
 
-#### 2. Define variables to hold the current, and previous state enum
+## 2. Define variables to hold the current, and previous state enum
 Holding both these values allows us to compare them as we enter a state, to see if it is the first time we have entered the state.
 
 ```
@@ -98,22 +102,45 @@ StateType smState = STATE_INIT;  // This variable also defines the initial state
 StateType lastState;
 ```
 
-#### 3. Define a State Names Array
+## 3. Define a State Names In PROGMEM
 This will allow us to print the enum above in human readable format
 ```
-char stateNames[][20] = {
-  "STATE_INIT",
-  "STATE_WAIT",
-  "STATE_STOP",
-  "STATE_START",
-  "STATE_SET_SPEED_HZ",
-  "STATE_SET_SPEED_RPM",
-  "STATE_PING",
-  "STATE_HELP"
+const char STATE_0[] PROGMEM = "STATE_INIT";
+const char STATE_1[] PROGMEM = "STATE_WAIT";
+const char STATE_2[] PROGMEM = "STATE_STOP";
+const char STATE_3[] PROGMEM = "STATE_START";
+const char STATE_4[] PROGMEM = "STATE_SET_SPEED_HZ";
+const char STATE_5[] PROGMEM = "STATE_SET_SPEED_RPM";
+const char STATE_17[] PROGMEM = "STATE_STATUS";
+const char STATE_18[] PROGMEM = " STATE_HELP";
+```
+
+### 3b List all PROGMEM strings in an array
+```
+const char *const stateNames[] PROGMEM = {
+  STATE_0,
+  STATE_1,
+  STATE_2,
+  STATE_3,
+  STATE_4,
+  STATE_5,
+  STATE_6,
+  STATE_7,
+  STATE_8,
+  STATE_9,
+  STATE_10,
+  STATE_11,
+  STATE_12,
+  STATE_13,
+  STATE_14,
+  STATE_15,
+  STATE_16,
+  STATE_17,
+  STATE_18,
 };
 ```
 
-#### 4. Define the state machine function prototypes
+## 4. Define the state machine function prototypes
 Any function that will be passed data from a user input will be passed the same jsonStateData structure as an argument
 ```
 void sm_state_init(void);
@@ -129,8 +156,9 @@ void sm_state_help(void);
 
 
 
-#### 5. Define all the state machine functions
- _A typical state function template is shown below_
+## 5. Define all the state machine functions
+ _A typical state function template is shown below_ <br>
+- Ensure that every named state has a corresponding function 
 
 ```
 void sm_state_template(jsonStateData stateData) {
@@ -157,7 +185,7 @@ void sm_state_template(jsonStateData stateData) {
 ```
 
 
-#### 6. Finally define the state machine function `sm_Run()`
+## 6. Finally define the state machine function `sm_Run()`
 _A switch case structure calls each function based on the current `smState` variable_ <br>
 Note -> Automatically generate the switch case from the list of ENUM states and list of function prototypes! -> https://github.com/ImogenWren/switch-case-generator
 
@@ -209,17 +237,17 @@ void sm_Run(jsonStateData stateData) {
 ```
 
 
-## 2. Modifying `jsonConfig.h`
-_This header should be used with the jsonMessenger library to define all the working states & commands that can be decoded by the jsonMessenger system._ <br>
+# 2. Modifying `jsonConfig.h`
+_This header should be used with the jsonMessenger library to define all the working states & commands that can be decoded by the jsonMessenger system._
 This library is designed to parse commands recieved via the Serial object in Arduino. Commands should be formatted in CMD:VALUE pairs as follows:
 
-#### Version 1 -> succinct command structure
+### Version 1 -> succinct command structure
 `{"CMD":"VALUE"}` -> for CMDs with passed values  <br>
 or <br>
 `{"CMD":0}` -> for CMDs with no additional values <br>
-note: in the 2nd example, any data entered after `:` will be ignored, as we have already defined the datatypes that will be passed with each command to the parser, however some value should be included to prevent the deserialization function from throwing errors (though it will often execute correctly even if no dummy value is included)
+note: in the 2nd example, any data entered after `:` will be ignored, as we have already defined the datatypes that will be passed with each command to the parser.
 
-#### Version 2 -> Verbose command structure
+### Version 2 -> Verbose command structure
 `{"set":"CMD","to":"VALUE"}` -> for CMDs with passed values  <br>
 or  <br>
 `{"set":"CMD"}` -> for CMDs with no additional data.  <br>
@@ -230,7 +258,7 @@ for the existance of matching keys, and ignore anything else. <br>
 All modifications should be carried out in this header file `jsonConfig.h`, please do not modify jsonMessenger.h or jsonMessenger.cpp! (unless you have to)
 
 
-#### 1. Define an enum to define variable types
+## 1. Define an enum to define variable types
  These will be linked to a state enum so when a message with a keyword is received, we can look up what 
  data type will be included with the message
  
@@ -255,7 +283,7 @@ static char typeNames[][12] = {
 };
 ```
 
-#### 2. Declare a list of all possible key values as ENUM. 
+## 2. Declare a list of all possible key values as ENUM. 
 These values will be passed out of the jsonMessenger Object and can be used to control a state machine external to this library (i.e the one defined in stateConfig.h). <br>
 _NOTE this list may not include all possible states, JUST the states that are triggered by receiving a command_ <br>
 - Include a null value at 0 -> This is because this enum will be initialised at 0 to represent jsonMessenger not receiving data, or being unable to parse a command
@@ -273,7 +301,7 @@ typedef enum {
 } jsonStates;
 ```
 
-#### 3. Link each jsonState ENUM with the datatype ENUM in a ~~map~~<depreciated> structure -> Now uses 2D array!.
+## 3. Link each jsonState ENUM with the datatype ENUM in a ~~map~~<depreciated> structure -> Now uses 2D array!.
 ```
 const uint16_t jsonStateMap[NUM_VALUES][2] = {
   { jsonStates::NONE, dataTypes::EMPTY },
@@ -289,7 +317,7 @@ const uint16_t jsonStateMap[NUM_VALUES][2] = {
 
 ```
 
-##### 4. Declare a list of key commands that will be required to be parsed 
+## 4. Declare a list of key commands that will be required to be parsed 
 This must match the order of the enums above, including the NULL or
 NONE value, but does not have to include NUM_VALUES. This list will be the actual commands that can be parsed by the system
 ```
@@ -306,7 +334,7 @@ static char jsonCommandKeys[][5] = {
 NOTE, this can also be used to turn the enums above back into strings for human readability. <br>
 
 
-#### 5. Finally Declare a data structure
+## 5. Finally Declare a data structure
 _This will hold both the jsonStates enum, and any data that will need to be passed from jsonMessenger and outside of this library._ <br>
 
 We can make this fairly generic by including additional datatypes, or we can reduce the size of the memory used by removing the unneeded ones. <br>
@@ -329,24 +357,24 @@ struct jsonStateData {
 
 <br>
 
-## 3. Modifying code inside `void loop()` function & within Global Scope
+# 3. Modifying code inside `void loop()` function & within Global Scope
 _This is the point at which the `jsonMessenger` library and `stateConfig.h` meet. Carefully implementing this last step unlocks the full functionality of the header files configured in the previous steps_
 
-#### 1. Create a global jsonMessenger Object
+## 1. Create a global jsonMessenger Object
 _I create this within the `globals.h` file, but feel free to put this anywhere within global scope_  <br>
 `jsonMessenger jsonRX;` 
 
-#### 2. Call `jsonMessenger::jsonReadSerialLoop()`
+## 2. Call `jsonMessenger::jsonReadSerialLoop()`
 _This function listens for serial commands, parses them if received and returns a data structure including flags for the requested state, and the data passed into the system_  <br>
 - If no serial command is received, or the data is unable to be parsed, it returns a null flag, and the program continues waiting for another command  <br>
 
 Create a `jsonStateData` structure to receive the data from the loop function  <br>
 `  jsonStateData nextState_data = jsonRX.jsonReadSerialLoop();`  <br>
 
-#### 3. Check the structure for `cmd_recieved` flag 
+## 3. Check the structure for `cmd_recieved` flag 
  `if (nextState_data.cmd_received) {  // If command is received ` 
 
-#### 4. If/If Else tree to parse the requested state enum, and define the state defined in `stateConfig.h`
+## 4. If Else tree to parse the requested state enum, and define the state defined in `stateConfig.h`
 ```
  // This is the bit that parses the command recieved by user, and sets the state machine to go to the correct state
     if (nextState_data.cmdState == STOP) {  // if fan speed change command received
@@ -366,8 +394,8 @@ Create a `jsonStateData` structure to receive the data from the loop function  <
     }
   }
 ```
-#### 5. Call the state machine function, and pass the data structure as an argument
-`sm_Run(nextState_data);  // This Runs the state machine in the correct state, and is passed all of the data sent by the last command`
+## 5. Call the state machine function in the loop(), and pass the data structure as an argument
+`sm_Run(&nextState_data);  // This Runs the state machine in the correct state, and is passed all of the data sent by the last command`
 
 
 ## Finished -> State Machine and jsonMessenger are now fully configured!

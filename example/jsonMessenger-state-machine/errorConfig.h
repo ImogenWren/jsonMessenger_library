@@ -1,11 +1,13 @@
 /* errorConfig.h
 
+Ideas for improvements to the error reporting system
 
 
 */
 
 
 // Define list of enums here for error codes
+
 
 /*
   typedef enum {
@@ -15,6 +17,16 @@
     TEMP_OUTOF_RANGE = -9,
     OUT_OF_RANGE_VAL = -10
   } errorCode;
+
+
+struct errorCodeStruct = {
+  int errorCode;
+  messageLevel errorLevel;
+}
+
+// Better, list of structs
+
+
 */
 
 /*        Template for Error Codes

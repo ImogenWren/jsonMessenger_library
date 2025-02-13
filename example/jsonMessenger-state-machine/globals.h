@@ -19,8 +19,8 @@
 
 
 // Program Attributes
-#define EXPERIMENT_NAME "jsonMessenger-state-machine-example"
-#define FIRMWARE_VERSION "V0.0.0"
+#define EXPERIMENT_NAME "jsonMessenger-state-machine"
+#define FIRMWARE_VERSION "V1.0.0"
 #define DEVELOPER "Imogen-Wren"
 
 // Hardware Definitions
@@ -32,11 +32,10 @@
 #define WARNING_ACTIVE_PERIOD_mS 60000  // 1 min
 
 // JSON Options
-// jsonMessenger    -> send and parse commands
-#define COMMAND_SIZE 64  // what command find better description
+
 
 // jsonReporter     -> report data
-#define PRINT_RATE_Hz 40
+#define PRINT_RATE_INIT_Hz 10
 #define PRINT_PERIODIC_UPDATES true
 #define PRINT_JSON true
 #define PRETTY_PRINT_JSON false
@@ -44,7 +43,7 @@
 
 // Debugging Options
 #define DEBUG_STATES false
-#define DEBUG_STATE_MACHINE false
+#define DEBUG_STATE_MACHINE true
 #define COMMAND_HINTS false
 
 
@@ -60,8 +59,7 @@ autoDelay printDelay;  // Delay object for printing periodic JSON messages // DE
 errorRep errors;
 
 autoDelay sampleDelay;
-uint16_t sampleRate_Hz = 1;
-uint32_t sampleDelay_mS = 1000 / sampleRate_Hz;
+
 
 // Global Variables
 
@@ -71,8 +69,10 @@ bool streaming_active = false;
 bool snapshop_active = false;
 uint16_t snapshot_timer_mS = 25000;
 uint32_t snapshot_starttime_mS;
+uint16_t sampleRate_Hz = PRINT_RATE_INIT_Hz;
+uint32_t sampleDelay_mS = 1000 / sampleRate_Hz;
 
-uint32_t print_delay_mS = 1000 / PRINT_RATE_Hz;
+
 
 
 

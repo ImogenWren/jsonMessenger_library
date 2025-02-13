@@ -1,4 +1,5 @@
 /* jsonMessenger.h
+
 _Library to simplify two way communication over Serial interfaces using JSON formatted messages_
 
 Imogen Heard
@@ -6,8 +7,11 @@ Imogen Heard
 
 Please see: https://github.com/ImogenWren/jsonMessenger_library for latest version and usage instructions
 
-Version V1.0.0
-- Focus on receiving & parsing incoming Serial messages in JSON format
+
+Version V1.1.1
+- Focus on receiving & parsing incoming Serial CMD messages in JSON format
+- Working state machine framework outlined in stateConfig.h
+- jsonMessenger configureable almost entirely within user editable file jsonConfig.h
 
 
 
@@ -49,8 +53,9 @@ char exampleCommands[][32] = {
 #endif
 */
 
+//char jsonEnd[4] = {"\"}"};
 
-
+#define CMD_QUEUE_LENGTH 10
 
 
 class jsonMessenger {
@@ -69,9 +74,9 @@ public:
   void printJSON(StaticJsonDocument<JSON_RX_SIZE> *jsonDoc);  // Prints the static jsonRXdoc
 
 
-  void printCMDkey(jsonStates state);  // to print the state in human readable form without coping the entire list of keys to global scope
+  const char *getCMDkey(jsonStates state);  // to print the state in human readable form without coping the entire list of keys to global scope
 
-  void printDataType(dataTypes type);
+  const char *getDataType(dataTypes type);
 
   void printJSONdata(jsonStateData *data);
 
@@ -87,7 +92,6 @@ private:
   jsonStateData jsonQueue[CMD_QUEUE_LENGTH];
   int8_t queue_size = 0;  // must be managed "manually"
 #endif
-
 };
 
 

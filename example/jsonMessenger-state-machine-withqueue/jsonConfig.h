@@ -7,8 +7,9 @@ This library is designed to parse commands recieved via the Serial object in Ard
 Version 1 -> succinct command structure
 `{"CMD":"VALUE"}` -> for CMDs with passed values
 or
-`{"CMD":} -> for CMDs with no additional values
-note: in the 2nd example, any data entered after : will be ignored, as we have already defined the datatypes that will be passed with each command to the parser
+`{"CMD":0} -> for CMDs with no additional values
+note: in the 2nd example, any data entered after : will be ignored, as we have already defined the datatypes that will be passed with each command to the parser,
+ however some data should be included to prevent errors in parsing JSON commands
 
 Version 2 -> Verbose command structure
 `{"set":"CMD","to":"VALUE"} -> for CMDs with passed values
@@ -22,7 +23,7 @@ for the existance of matching keys, and ignore anything else.
 Please see: https://github.com/ImogenWren/jsonMessenger_library for latest version and usage instructions, or follow the numbered comments for an
 explanation of how to modify this template for other uses. 
 
-All modifications should be carried out in this header file `jsonConfig.h`, please do not modify jsonMessenger.h or jsonMessenger.cpp!
+All modifications to jsonMessgender should be carried out in this header file `jsonConfig.h`, please do not modify jsonMessenger.h or jsonMessenger.cpp!
 
 Imogen Heard
 21/10/2024
@@ -37,8 +38,9 @@ Imogen Heard
 
 
 
-#define JSON_USE_QUEUE true        //At least one of these should be true
-#define JSON_USE_SINGLE_FRAME true  // Single frame is always valid, but this can be used to disable features not wanted when using queue
+#define JSON_USE_QUEUE true        //If true, library uses queueing, and jsonStateData should be passed from the dequeue function.
+                                    // if false, library will respond to each command individually and the jsonStateData is passed from jsonReadSerialLoop function
+
 
 #define JSON_RX_SIZE 32     // Size of the buffer to hold incoming JSON formatted commands to be parsed
 #define JSON_MSG_LENGTH 12   // Length of msg array in json data structure

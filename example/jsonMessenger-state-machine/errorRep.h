@@ -44,7 +44,7 @@ Imogen Heard
 #define JSON_BUFFER_SIZE 150  // used to print error report -> make sure sized to print all error data when requested
 
 #define ERROR_MSG_LENGTH 24  // Increase for more verbose error messages, decrease to save memory
-#define CONTEXT_LENGTH 24    //
+#define CONTEXT_LENGTH 24    //  Increase for verbose context descriptions, decrease to save memory
 
 #define DEBUG_ERRORS false
 #define ERROR_LEVEL_PRIORITY_ENABLE false

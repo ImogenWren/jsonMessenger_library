@@ -6,10 +6,12 @@ Imogen Heard
 17/10/24
 
 Please see: https://github.com/ImogenWren/jsonMessenger_library for latest version and usage instructions
-NOTE: This library is memory intensive and may not be suitable for lightweight microcontrollers (uno, nano, AtTiny etc)
 
-Version V1.0.0
+
+Version V1.1.1
 - Focus on receiving & parsing incoming Serial CMD messages in JSON format
+- Working state machine framework outlined in stateConfig.h
+- jsonMessenger configureable almost entirely within user editable file jsonConfig.h
 
 
 

@@ -3,7 +3,7 @@
 This header defines the state machine framework. It is intended to be used with the jsonMessenger.h Library to handle receiving and parsing JSON formatted commands entered by a user, 
 however this state machine also operates independently and can be used without jsonMessenger.h
 
-This State Machine framework can be adapted to many different purposes, follow the numbered comments for an explanation
+This State Machine framework can be adapted to many different purposes, follow the numbered comments for an explanation on how to modify it for your own use
 
 Imogen Heard
 11/02/2025
@@ -14,6 +14,10 @@ Imogen Heard
 #pragma once
 
 #include "globals.h"
+
+
+
+
 
 
 // 1. Define all the valid states for the state machine with an enum.
@@ -49,30 +53,55 @@ StateType smState = STATE_INIT;
 StateType lastState;
 
 
+//3. Declare all the strings for the stateNames in PROGMEM this will allow us to print the enum above in human readable format with a lower overhead
+
+const char STATE_0[] PROGMEM = "STATE_INIT";
+const char STATE_1[] PROGMEM = "STATE_WAIT";
+const char STATE_2[] PROGMEM = "STATE_STOP";
+const char STATE_3[] PROGMEM = "STATE_START";
+const char STATE_4[] PROGMEM = "STATE_SET_SPEED_HZ";
+const char STATE_5[] PROGMEM = "STATE_SET_SPEED_RPM";
+const char STATE_6[] PROGMEM = "STATE_HOME";
+const char STATE_7[] PROGMEM = "STATE_CA;LIBRATE";
+const char STATE_8[] PROGMEM = "STATE_FREEWHEEL";
+const char STATE_9[] PROGMEM = "STATE_BRAKE";
+const char STATE_10[] PROGMEM = "STATE_GOTO";
+const char STATE_11[] PROGMEM = "STATE_SAMPLERATE";
+const char STATE_12[] PROGMEM = "STATE_STARTSTREAM";
+const char STATE_13[] PROGMEM = "STATE_STOPSTREAM";
+const char STATE_14[] PROGMEM = "STATE_SNAPSHOT";
+const char STATE_15[] PROGMEM = "STATE_SNAPTIME";
+const char STATE_16[] PROGMEM = "STATE_PING";
+const char STATE_17[] PROGMEM = "STATE_STATUS";
+const char STATE_18[] PROGMEM = " STATE_HELP";
 
 
-// 3. Define a State Names Array, this will allow us to print the enum above in human readable format
-char stateNames[][20] = {
-  "STATE_INIT",
-  "STATE_WAIT",
-  "STATE_STOP",
-  "STATE_START",
-  "STATE_SET_SPEED_HZ",
-  "STATE_SET_SPEED_RPM",
-  "STATE_HOME",
-  "STATE_CALIBRATE",
-  "STATE_FREEWHEEL",
-  "STATE_BRAKE",
-  "STATE_GOTO",
-  "STATE_SAMPLERATE",
-  "STATE_STARTSTREAM",
-  "STATE_STOPSTREAM",
-  "STATE_SNAPSHOT",
-  "STATE_SNAPTIME",
-  "STATE_STATUS",
-  "STATE_PING",
-  "STATE_HELP"
+
+// 3b. list all strings in an array to aid in recall later
+const char *const stateNames[] PROGMEM = {
+  STATE_0,
+  STATE_1,
+  STATE_2,
+  STATE_3,
+  STATE_4,
+  STATE_5,
+  STATE_6,
+  STATE_7,
+  STATE_8,
+  STATE_9,
+  STATE_10,
+  STATE_11,
+  STATE_12,
+  STATE_13,
+  STATE_14,
+  STATE_15,
+  STATE_16,
+  STATE_17,
+  STATE_18,
 };
+
+
+
 
 
 // 4. Define the state machine function prototypes.
@@ -126,19 +155,19 @@ void sm_state_template(jsonStateData stateData) {
 }
 */
 
-#define STATE_INIT_TEXT 'state: init'
+
 
 // Init state, only called at startup
 void sm_state_init() {
   if (lastState != smState) {
-    Serial.println(STATE_INIT_TEXT);
+    Serial.println(F("state: INIT"));
   }
 
   smState = STATE_WAIT;
 }
 
 
-// Doing this doesnt actually save any RAM compared to having F macro strings within a function. 
+// Doing this doesnt actually save any RAM compared to having F macro strings within a function.
 // But its good to remind myself how this works
 const char cmd_0[] PROGMEM = "{\"start\":0}            -> Start/Update Motor Speed";
 const char cmd_1[] PROGMEM = "{\"stop\":0}             -> Stop Motor";
@@ -155,10 +184,10 @@ const char cmd_11[] PROGMEM = "{\"endst\":0}            -> End Data Streaming";
 const char cmd_12[] PROGMEM = "{\"snap\":0}             -> Take Data Snapshot";
 const char cmd_13[] PROGMEM = "{\"time\": 1 - 250000 }  -> Set Time for Data Snapshot (mS)";
 const char cmd_14[] PROGMEM = "{\"ping\":0}             -> Ping Servo";
-const char cmd_15[] PROGMEM = "{\"status\":0}           -> Print Status"; 
+const char cmd_15[] PROGMEM = "{\"status\":0}           -> Print Status";
 const char cmd_16[] PROGMEM = "{\"help\":0}             -> Print Commands to Serial Monitor";
 
-#define LONGEST_STRING 59
+#define LONGEST_CMD_STRING 59
 #define LIST_LENGTH 17
 
 const char *const cmd_table[] PROGMEM = {
@@ -185,32 +214,15 @@ const char *const cmd_table[] PROGMEM = {
 //https://forum.arduino.cc/t/using-large-text/248390/7
 // Not a state, but function called by "help" state to print commands list to users
 void print_cmds() {
-  char buffer[LONGEST_STRING + 1];
+  char buffer[LONGEST_CMD_STRING + 1];
   for (int i = 0; i < LIST_LENGTH; i++) {
     strcpy_P(buffer, (char *)pgm_read_ptr(&(cmd_table[i])));  // Necessary casts and dereferencing, just copy.
     Serial.println(buffer);
   }
 }
-/*
-  Serial.println(F("   {\"start\":0}          -> Start/Update Motor Speed"));
-  Serial.println(F("   {\"stop\":0}           -> Stop Motor              "));
-  Serial.println(F("   {\"hz\": -20 to 20}    -> Set Motor Speed in Hz   "));
-  Serial.println(F("   {\"rpm\": -200 to 200} -> Set Motor Speed in RPM  "));
-  Serial.println(F("   {\"home\":\"\"}        -> Move Motor to home pos (test) "));
-  Serial.println(F("   {\"cal\":\"\"}         -> Run Calibration to home motor "));
-  Serial.println(F("   {\"free\":\"\"}        -> Set freewheel brake mode (test)"));
-  Serial.println(F("   {\"brake\":\"\"}       -> Set coolbrake brake mode (test)"));
-  Serial.println(F("   {\"goto\": -360 to 360}-> Goto Angle (test)              "));
-  Serial.println(F("   {\"sample\": 1 to 40}  -> Set Samplerate in Hz         "));
-  Serial.println(F("   {\"stream\":\"\"}      -> Start Data Streaming    "));
-  Serial.println(F("   {\"endst\":\"\"}       -> End Data Streaming      "));
-  Serial.println(F("   {\"snap\":\"\"}        -> Take Data Snapshot       "));             // Take a Snapshot of data
-  Serial.println(F("   {\"time\": 1 - 250000 }-> Set Time for Data Snapshot (mS)  "));     // Change the time over which the data snapshot is taken
-  Serial.println(F("   {\"ping\":\"\"}        -> Ping Servo               "));             // Ping the wobble-shaft with the servo
-  Serial.println(F("   {\"help\":\"\"}        -> Print Commands to Serial Monitor    "));  // Print commands list
 
-}
-*/
+
+
 
 // State Wait is the default state for this program
 void sm_state_wait() {
@@ -219,18 +231,18 @@ void sm_state_wait() {
 #if DEBUG_STATES == true
     Serial.println(F("state: WAIT"));
 #endif
-
 #if COMMAND_HINTS == true  // print suggested commands
     Serial.println(F("\nEnter cmd in format:"));
     print_cmds();
 #endif
     lastState = smState;
   }
+  // As default state does not have exit logic
 }
 
 
 
-// Stop the Motor
+
 void sm_state_stop(void) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
@@ -238,7 +250,7 @@ void sm_state_stop(void) {
 #endif
     lastState = smState;
   }
-  smState = STATE_STOPSTREAM;
+  smState = STATE_STOPSTREAM;  // Program does not have to go directly back to STATE_WAIT
 }
 
 
@@ -510,9 +522,11 @@ void sm_Run(jsonStateData *stateData) {
   if (smState < NUM_STATES) {
 #if DEBUG_STATE_MACHINE == true
     if (lastState != smState) {
-      Serial.print(F("{\"statemachine\":\""));
-      Serial.print(stateNames[smState]);
-      Serial.println(F("\"}"));
+      char buffer[LONGEST_CMD_STRING + 1];
+      char printBuffer[50];
+      strcpy_P(buffer, (char *)pgm_read_ptr(&(stateNames[smState])));  // Necessary casts and dereferencing, just copy.
+      sprintf(printBuffer, "{\"statemachine\":\"%s\"}", buffer);
+      Serial.println(printBuffer);
     }
 #endif
     switch (smState) {
@@ -560,7 +574,7 @@ void sm_Run(jsonStateData *stateData) {
         break;
       case STATE_PING:
         sm_state_ping();
-        break;      
+        break;
       case STATE_SNAPSHOT:
         sm_state_snapshot();
         break;
