@@ -1,7 +1,7 @@
 # jsonMessenger Library
-_Control a generic state machine using JSON formatted commands sent & received via Serial communication_
-Written by: Imogen Heard
-Date: 13/02/25
+_Control a generic state machine using JSON formatted commands sent & received via Serial communication_ <br>
+Written by: Imogen Heard <br>
+Date: 13/02/25 <br>
 
 ## Using This Template/Library
 To use this library:
