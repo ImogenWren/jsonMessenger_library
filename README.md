@@ -1,8 +1,22 @@
 # jsonMessenger Library
 _Control a generic state machine using JSON formatted commands sent & received via Serial communication_
+Written by: Imogen Heard
+Date: 13/02/25
+
+## Using This Template/Library
+To use this library:
+1. Download release and place folder into Arduino->libraries folder.
+2. Reload Arduino IDE and find examples under -> jsonMessenger_library
+3. Save examples with new name to modify for own use!
+
+Note:
+    _This template does not function like other libraries, as it relys on User Configureable header files to function correctly. <br> Therefore it is best to edit the examples, rather than just import the library into new sketches_
+
+## Current Version
+V1.2.1-jsonMessenger-production-ready
 
 ## Example Commands list
-_List of basic commands in JSON format. This list is printed by entering STATE_HELP
+_List of basic commands in JSON format. This list is printed by entering STATE_HELP_
 
 _Verbose Command Structure_
 `{"set":"CMD","to":"VALUE"}`
