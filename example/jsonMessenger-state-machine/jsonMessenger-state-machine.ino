@@ -32,7 +32,8 @@ Global variables use 1275 bytes (62%) of dynamic memory, leaving 773 bytes for l
 - Deployable version
 
 V1.1.1 Without Queing function
-
+Sketch uses 21156 bytes (65%) of program storage space. Maximum is 32256 bytes.
+Global variables use 1030 bytes (50%) of dynamic memory, leaving 1018 bytes for local variables. Maximum is 2048 bytes.
 
 
 */
