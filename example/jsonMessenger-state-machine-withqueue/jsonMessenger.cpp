@@ -7,6 +7,7 @@
 VERSION V0.2.0 REFACTORED TO USE ARRAYs instead of std::map
 
 
+
 */
 
 
@@ -16,7 +17,7 @@ jsonMessenger::jsonMessenger() {
 
 void jsonMessenger::jsonBegin() {
   // Serial.begin(115200);
-  Serial.println(F("{\"json\":\"messenger\",\"version\":\"V1.0.0\"}"));
+  Serial.println(F("{\"json\":\"messenger\",\"version\":\"V1.2.1\"}"));
 }
 
 
@@ -56,19 +57,22 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
       }
     }
 
+#if DEBUG_JSON_MESSENGER == true
     Serial.print(F("\n{\"rxed\": \""));
     Serial.print(command);
     Serial.println("\"}");
-
+#endif
     //Serial.read();  // clear any additional data left in the buffer
 
     // NEW FUNCTION, try deserializing directly from stream
     // deserializeJson(jsonRXdoc, Serial);  // less overhead but harder to debug
     DeserializationError error = deserializeJson(jsonRXdoc, command);  // more overhead but can print message before processing (good for debugging)
 
+#if DEBUG_JSON_MESSENGER == true
     Serial.print("{\"deserialization\":\"");
     Serial.print(error.c_str());
     Serial.println(F("\"}"));
+#endif
 
     JsonObject root = jsonRXdoc.as<JsonObject>();  // this was previously doc.to<JsonObject>(); DID NOT WORK! does now with "as"
                                                    // Now to parse the JSON message
@@ -90,11 +94,8 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
 
       if (root.containsKey(jsonCommandKeys[i]) || strcmp(keyString, jsonCommandKeys[i]) == 0) {  // Match is found, i holds the correct ENUM reference for the state
 
-        Serial.print(F("{\"key\":\""));
-        Serial.print(jsonCommandKeys[i]);
-        Serial.print(F("\",\"enum\":\""));
-        Serial.print(i);
-      
+
+
 
         // Serial.print("\"}");
         //Serial.println();
@@ -105,32 +106,37 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
         //   jsonRX_data.data_type = map_item->second;  // the second value contains the dataType enum (trying to cut out some middleman vars that are not doing anything)
 
         // new version using 2D array
-        Serial.print(F("\",\"dataType\":\""));
-        Serial.print(jsonStateMap[i][1]);
-        Serial.print(F("\",\"typeName\":\""));
-        Serial.print(typeNames[jsonStateMap[i][1]]);
-        Serial.print("\",");
 
         jsonRX_data.data_type = dataTypes_array[jsonStateMap[i][1]];  // this should contain the correct enum for the datatype
 
 
-        // Set the flags to trigger the state change
-        Serial.print(F("\"state\":\""));
-        Serial.print(jsonStateMap[i][0]);
-        Serial.print(F("\","));
 
+
+
+        // Set the flags to trigger the state change
         //  jsonRX_data.cmdState = i;  //
         jsonRX_data.cmdState = jsonStates(jsonStateMap[i][0]);  // these two lines should be identical, except one passes the ENUM, the other (the same) int value
         jsonRX_data.cmd_received = true;                        //Set flag to be passed outside of library and notify a command has been sent (depreciated if using queue)
 
 
-
-
+#if DEBUG_JSON_MESSENGER == true
+        Serial.print(F("{\"key\":\""));
+        Serial.print(jsonCommandKeys[i]);
+        Serial.print(F("\",\"enum\":\""));
+        Serial.print(i);
+        Serial.print(F("\",\"dataType\":\""));
+        Serial.print(jsonStateMap[i][1]);
+        Serial.print(F("\",\"typeName\":\""));
+        Serial.print(typeNames[jsonStateMap[i][1]]);
+        Serial.print(F("\","));
+        Serial.print(F("\"state\":\""));
+        Serial.print(jsonStateMap[i][0]);
+        Serial.print(F("\","));
+        Serial.print(F("\"data\":\""));
+#endif
 
         // Copy data into  correct place in data structure, and convert to string for debugging printing
         // then deal with data depending on state
-        Serial.print(F("\"data\":\""));
-
         if (jsonRX_data.data_type == EMPTY) {
           // Do nothing
         } else if (jsonRX_data.data_type == INTEGER) {  // Example of how to deal with different datatypes returned from jsonMessenger object
@@ -139,7 +145,9 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
           } else {
             jsonRX_data.numeric = jsonRXdoc[jsonCommandKeys[i]].as<int16_t>();
           }
+#if DEBUG_JSON_MESSENGER == true
           Serial.print(jsonRX_data.numeric);
+#endif
         } else if (jsonRX_data.data_type == FLOAT) {
           if (set_keyword_used) {
             jsonRX_data.floatData = root["to"].as<float>();
@@ -147,7 +155,9 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
             // jsonRX_data.floatData = jsonRXdoc[jsonCommandKeys[i]].as<float>();   // this line not working and stalling everything ( may have been unrelated!)
             jsonRX_data.floatData = root[jsonCommandKeys[i]].as<float>();  // try extracted from root doc instead
           }
+#if DEBUG_JSON_MESSENGER == true
           Serial.print(jsonRX_data.floatData);
+#endif
         } else if (jsonRX_data.data_type == CSTRING) {
           const char *extracted;
           if (set_keyword_used) {
@@ -157,12 +167,15 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
           }
           memcpy(jsonRX_data.msg, extracted, JSON_MSG_LENGTH);
           jsonRX_data.msg[JSON_MSG_LENGTH - 1] = '\0';
+#if DEBUG_JSON_MESSENGER == true
           Serial.print(jsonRX_data.msg);
+#endif
         } else {
           Serial.println(F("dataType-exception"));
         }
+#if DEBUG_JSON_MESSENGER == true
         Serial.println("\"}");
-
+#endif
 #if JSON_USE_QUEUE == true
         if (jsonMessenger::enque_cmd(&jsonRX_data) == -1) {
           Serial.println(F("{\cmd\":\"enque-failed\"}"));
@@ -170,7 +183,7 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
 #endif
         return jsonRX_data;  // return the structure as the data has been extracted
       } else {
-        if (i == NUM_VALUES-1) {  // if i = NUM_VALUES we have reached the end of the for loop, if no match has been found, print the unknown cmd
+        if (i == NUM_VALUES - 1) {  // if i = NUM_VALUES we have reached the end of the for loop, if no match has been found, print the unknown cmd
           Serial.println(F("{\"cmd\":\"unknown\"}"));
         }
         // We have pre-parsed the alternative set command so now else doesnt need to do anything

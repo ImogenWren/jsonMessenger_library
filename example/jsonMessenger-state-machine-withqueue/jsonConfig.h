@@ -40,10 +40,13 @@ Imogen Heard
 
 #define JSON_USE_QUEUE true        //If true, library uses queueing, and jsonStateData should be passed from the dequeue function.
                                     // if false, library will respond to each command individually and the jsonStateData is passed from jsonReadSerialLoop function
+#define CMD_QUEUE_LENGTH 10   // Max length of CMD_QUEUE if activated
+
+#define DEBUG_JSON_MESSENGER false  // Prints debugging messages
 
 
 #define JSON_RX_SIZE 32     // Size of the buffer to hold incoming JSON formatted commands to be parsed
-#define JSON_MSG_LENGTH 12   // Length of msg array in json data structure
+#define JSON_MSG_LENGTH 12  // Length of msg array in json data structure
 
 
 // 1. Define an enum to define variable type used, These will be linked to a state enum so when a keyword is received, we can look up what data type should be sent with it
