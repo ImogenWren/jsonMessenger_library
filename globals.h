@@ -67,7 +67,7 @@ autoDelay sampleDelay;
 
 // Sampling Vars
 bool streaming_active = false;
-bool snapshop_active = false;
+bool snapshot_active = false;
 uint16_t snapshot_timer_mS = 25000;
 uint32_t snapshot_starttime_mS;
 uint16_t sampleRate_Hz = PRINT_RATE_INIT_Hz;

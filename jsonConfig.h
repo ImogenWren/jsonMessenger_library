@@ -1,4 +1,4 @@
-/*  jsonConfig.h
+/*  jsonConfig.h 
 
 This header should be used with the jsonMessenger library to define all the working states & commands that can be decoded by the jsonMessenger system.
 
@@ -7,9 +7,8 @@ This library is designed to parse commands recieved via the Serial object in Ard
 Version 1 -> succinct command structure
 `{"CMD":"VALUE"}` -> for CMDs with passed values
 or
-`{"CMD":0} -> for CMDs with no additional values
-note: in the 2nd example, any data entered after : will be ignored, as we have already defined the datatypes that will be passed with each command to the parser,
- however some data should be included to prevent errors in parsing JSON commands
+`{"CMD":X} -> for CMDs with no additional values
+note: in the 2nd example, any data entered after : will be ignored, as we have already defined the datatypes that will be passed with each command to the parser
 
 Version 2 -> Verbose command structure
 `{"set":"CMD","to":"VALUE"} -> for CMDs with passed values
@@ -21,9 +20,9 @@ for the existance of matching keys, and ignore anything else.
 
 
 Please see: https://github.com/ImogenWren/jsonMessenger_library for latest version and usage instructions, or follow the numbered comments for an
-explanation of how to modify this template for other uses. 
+explanation of how to modify this template for other uses.
 
-All modifications to jsonMessgender should be carried out in this header file `jsonConfig.h`, please do not modify jsonMessenger.h or jsonMessenger.cpp!
+All modifications should be carried out in this header file `jsonConfig.h`, please do not modify jsonMessenger.h or jsonMessenger.cpp!
 
 Imogen Heard
 21/10/2024
@@ -37,15 +36,27 @@ Imogen Heard
 #define jsonConfig_h
 
 
-#define JSON_USE_QUEUE false  //If true, library uses queueing, and jsonStateData should be passed from the dequeue function. \
-                              // if false, library will respond to each command individually and the jsonStateData is passed from jsonReadSerialLoop function
-#define CMD_QUEUE_LENGTH 10   // Max length of CMD_QUEUE if activated
 
-#define DEBUG_JSON_MESSENGER false  // Prints debugging messages
+// As alternative to <map> data structure has been developed, this is all depreciated
+/*
+#ifdef __AVR__
+#include <ArduinoSTL.h>  // [Arduino Library Manager][Modified Version -> https://github.com/ImogenWren/ArduinoSTL]
+#pragma "ArduinoSTL Libary Included"
+#elif defined(STM32) || defined(ARDUINO_ARCH_STM32)
+#pragma "STM32 Board -> Using Arrays Instead of std::stl"
+#endif
+
+//#include <map>  // [std::map]
+*/
 
 
-#define JSON_RX_SIZE 32     // Size of the buffer to hold incoming JSON formatted commands to be parsed
-#define JSON_MSG_LENGTH 12  // Length of msg array in json data structure
+
+#define JSON_USE_QUEUE false        //At least one of these should be true
+#define JSON_USE_SINGLE_FRAME true  // Single frame is always valid, but this can be used to disable features not wanted when using queue
+
+#define JSON_RX_SIZE 64     // try 42 Need more for auth -> 32 Working on Arduino Nano
+#define CMD_QUEUE_LENGTH 3  // 3 Working on Arduino Nano
+#define JSON_MSG_LENGTH 9   // Length of msg array in json data structure
 
 
 // 1. Define an enum to define variable type used, These will be linked to a state enum so when a keyword is received, we can look up what data type should be sent with it
@@ -55,11 +66,12 @@ typedef enum {  // enum to pass variable types between functions
   INTEGER,
   FLOAT,
   CSTRING,
-  BOOL
+  BOOL,
+  AUTH  // 14/07/25 adding new datatype, this will tell jsonMessenger that 2 datas will be present, but will use already existing datatypes in RX data structure
 } dataTypes;
 
 // 1b. Place these enums into an array to enable lookup by index (This shouldnt be nessissary but it fixed a bug at one point)
-const dataTypes dataTypes_array[5] = { EMPTY, INTEGER, FLOAT, CSTRING, BOOL };
+const dataTypes dataTypes_array[6] = { EMPTY, INTEGER, FLOAT, CSTRING, BOOL, AUTH };
 
 
 // 1c. List the same enums as cStrings, this will enable human readability of enum above
@@ -68,8 +80,18 @@ static char typeNames[][8] = {
   "INTEGER",
   "FLOAT",
   "CSTRING",
-  "BOOL"
+  "BOOL",
+  "AUTH"
 };
+
+
+// this actually isnt needed at all
+/*
+struct {  // structure for returning data with an authorisation key
+  int16_t numericData;
+  char authKey[9];
+} authStruct;
+*/
 
 
 // 2. Declare a list of all possible key values as ENUM. These values will be passed out of the jsonMessenger Object and can be used to trigger different states
@@ -87,13 +109,18 @@ typedef enum {
   FREEWHEEL,
   BRAKE,
   GOTO,
+  MOVE,
   SAMPLERATE,
+  PRINTRATE,
   STARTSTREAM,
   STOPSTREAM,
   SNAPSHOT,
   SNAPTIME,
   PING,
-  STATUS,
+  OFFSET,
+  SETSECRET,
+  SETCAL,
+  GETCAL,
   HELP,
   NUM_VALUES  // Add sentinal NUM_VALUES to count number of elements, this is very important and will be used to size for loops inside the jsonMessenger object
 } jsonStates;
@@ -109,17 +136,22 @@ const uint16_t jsonStateMap[NUM_VALUES][2] = {
   { jsonStates::SET_SPEED_HZ, dataTypes::FLOAT },
   { jsonStates::SET_SPEED_RPM, dataTypes::FLOAT },
   { jsonStates::HOME, dataTypes::EMPTY },
-  { jsonStates::CALIBRATE, dataTypes::EMPTY },
+  { jsonStates::CALIBRATE, dataTypes::INTEGER },
   { jsonStates::FREEWHEEL, dataTypes::EMPTY },
   { jsonStates::BRAKE, dataTypes::EMPTY },
   { jsonStates::GOTO, dataTypes::INTEGER },
+  { jsonStates::MOVE, dataTypes::FLOAT },
   { jsonStates::SAMPLERATE, dataTypes::INTEGER },
+  { jsonStates::PRINTRATE, dataTypes::INTEGER },
   { jsonStates::STARTSTREAM, dataTypes::EMPTY },
   { jsonStates::STOPSTREAM, dataTypes::EMPTY },
   { jsonStates::SNAPSHOT, dataTypes::EMPTY },
   { jsonStates::SNAPTIME, dataTypes::INTEGER },
   { jsonStates::PING, dataTypes::EMPTY },
-  { jsonStates::STATUS, dataTypes::EMPTY },
+  { jsonStates::OFFSET, dataTypes::INTEGER },  // defunct given new secret methods
+  { jsonStates::SETSECRET, dataTypes::CSTRING },
+  { jsonStates::SETCAL, dataTypes::AUTH },
+  { jsonStates::GETCAL, dataTypes::CSTRING },
   { jsonStates::HELP, dataTypes::EMPTY }
 };
 
@@ -138,26 +170,21 @@ static char jsonCommandKeys[][7] = {
   "free",
   "brake",
   "goto",
+  "move",
   "sample",
+  "print",
   "stream",
   "endst",
   "snap",
   "time",
   "ping",
-  "status",
+  "offset",
+  "secret",
+  "setcal",
+  "getcal",
   "help"
 };
 // NOTE, this can also be used to turn the enums above back into strings for human readability
-
-//<depreciated>
-// Also including generic keys, these are used for more verbose JSON commands like:
-// {"set": "item", "to":"value"}
-//static char jsonGenerics[][5] = {
-//  "NULL",
-//  "set",
-//  "to",
-//  "get"
-//};
 
 
 
@@ -169,10 +196,10 @@ struct jsonStateData {
   int16_t numeric;      // empty generic data slots for each data type
   float floatData;
   char msg[JSON_MSG_LENGTH];
+  // authStruct authData;
   bool cmd_received;  // Flag set true by jsonLoop when cmd is received
 };
 
-//jsonStateData emptyStruct_example = { NONE, EMPTY, 0, 0.0, "", false };  // commented out as global var would eat up extra memory. Instead of using this variable, just copy the example into local scope where needed
 
 
 

@@ -6,12 +6,10 @@ Imogen Heard
 17/10/24
 
 Please see: https://github.com/ImogenWren/jsonMessenger_library for latest version and usage instructions
+NOTE: This library is memory intensive and may not be suitable for lightweight microcontrollers (uno, nano, AtTiny etc)
 
-
-Version V1.1.1
+Version V1.0.0
 - Focus on receiving & parsing incoming Serial CMD messages in JSON format
-- Working state machine framework outlined in stateConfig.h
-- jsonMessenger configureable almost entirely within user editable file jsonConfig.h
 
 
 
@@ -38,6 +36,12 @@ Version V1.1.1
 
 
 
+#define JSON_MESSENGER_VERSION "V2.0.0"
+#define PRINT_RX_COMMAND true      // JSON safe printing of command received
+#define PRINT_DESERIAL_ERROR true  // JSON safe printing of error status of deserialised command
+#define DEBUG_JSON_MESSENGER true  // JSON safe printing of entire parsed message including ENUM values {"key":KEY,"num":KEY_ENUM,"dataType":DATATYPE_ENUM,"typeName":TYPENAME,"state":STATE_ENUM,"data":DATA}
+
+
 /*
 #if COMMAND_HINTS == true
 char exampleCommands[][32] = {
@@ -53,14 +57,11 @@ char exampleCommands[][32] = {
 #endif
 */
 
-//char jsonEnd[4] = {"\"}"};
 
-#define CMD_QUEUE_LENGTH 10
+
 
 
 class jsonMessenger {
-private:
-
 
 
 public:
@@ -87,6 +88,10 @@ public:
 #endif
 
 private:
+
+
+
+ // const authStruct blankAuth;   not needed
 
 #if JSON_USE_QUEUE == true
   jsonStateData jsonQueue[CMD_QUEUE_LENGTH];

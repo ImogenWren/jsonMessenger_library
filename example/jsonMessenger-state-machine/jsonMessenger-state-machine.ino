@@ -143,15 +143,15 @@ void loop() {
   // Run Periodic Functions to gather data here
 
 
-  if (streaming_active || snapshop_active) {
+  if (streaming_active || snapshot_active) {
     if (sampleDelay.millisDelay(sampleDelay_mS)) {
       //print the sampled data
       update_json();
       //  errors.print_json_status(true);
     }
-    if (snapshop_active) {
+    if (snapshot_active) {
       if (millis() - snapshot_starttime_mS >= snapshot_timer_mS) {
-        snapshop_active = false;
+        snapshot_active = false;
       }
     }
   }

@@ -448,7 +448,7 @@ void sm_state_snapshot() {
 #endif
     lastState = smState;
   }
-  snapshop_active = true;
+  snapshot_active = true;
   snapshot_starttime_mS = millis();
   smState = STATE_WAIT;
 }

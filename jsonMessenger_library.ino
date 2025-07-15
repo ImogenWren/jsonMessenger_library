@@ -115,8 +115,12 @@ void loop() {
       smState = STATE_BRAKE;
     } else if (nextState_data.cmdState == GOTO) {
       smState = STATE_GOTO;
+    } else if (nextState_data.cmdState == MOVE) {
+      smState = STATE_MOVE;
     } else if (nextState_data.cmdState == SAMPLERATE) {
       smState = STATE_SAMPLERATE;
+    } else if (nextState_data.cmdState == PRINTRATE) {
+      smState = STATE_PRINTRATE;
     } else if (nextState_data.cmdState == STARTSTREAM) {
       smState = STATE_STARTSTREAM;
     } else if (nextState_data.cmdState == STOPSTREAM) {
@@ -127,13 +131,19 @@ void loop() {
       smState = STATE_SNAPTIME;
     } else if (nextState_data.cmdState == PING) {
       smState = STATE_PING;
-    } else if (nextState_data.cmdState == STATUS) {
-      smState = STATE_STATUS;
+    } else if (nextState_data.cmdState == OFFSET) {
+      smState = STATE_OFFSET;
+    } else if (nextState_data.cmdState == SETSECRET) {
+      smState = STATE_SETSECRET;
+    } else if (nextState_data.cmdState == SETCAL) {
+      smState = STATE_SETCAL;
+    } else if (nextState_data.cmdState == GETCAL) {
+      smState = STATE_GETCAL;
     } else if (nextState_data.cmdState == HELP) {
       smState = STATE_HELP;
     } else {
       // std::cout << "{\"WARNING\":\"Unrecognised cmdState\"}" << std::endl;
-      Serial.println(F("{\"WARNING\":\"Unrecognised cmdState\"}"));
+      Serial.println("{\"WARNING\":\"Unrecognised cmdState (loop)\"}");
     }
   }
 
@@ -147,15 +157,15 @@ void loop() {
   // Run Periodic Functions to gather data here
 
 
-  if (streaming_active || snapshop_active) {
+  if (streaming_active || snapshot_active) {
     if (sampleDelay.millisDelay(sampleDelay_mS)) {
       //print the sampled data
       update_json();
       //  errors.print_json_status(true);
     }
-    if (snapshop_active) {
+    if (snapshot_active) {
       if (millis() - snapshot_starttime_mS >= snapshot_timer_mS) {
-        snapshop_active = false;
+        snapshot_active = false;
       }
     }
   }
